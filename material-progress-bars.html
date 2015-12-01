@@ -1,0 +1,217 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<!--
+A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer. WIP!
+Add nodes (typically divs) in the element light DOM with the `bar` CSS class
+and a decimal `value` attribute to add progress bars.
+
+Note that these bars have a rtl (right to left) layout by default, in order to end-justify its
+children (Google Fit style).
+
+Example:
+
+    <material-progress-bars max="128" bar-height="22">
+      <div class="bar" value="21">
+        <iron-icon icon="maps:directions-walk"></iron-icon>
+      </div>
+      <div class="bar" value="13" icon="maps:directions-bike">
+        <iron-icon icon="maps:directions-run"></iron-icon>
+      </div>
+      <div class="bar" value="50">
+        <iron-icon icon="maps:directions-bike"></iron-icon>
+        <span>Hello</span>
+      </div>
+      <div class="bar" value="30">
+        <span>World</span>
+      </div>
+    </material-progress-bars>
+
+### Styling
+
+The following custom properties and mixins are available for stylingt:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--material-progress-bar-background-color` | Background color of the whole progress bar. | `#E0E0E0`
+
+@group material-progress
+@element material-progress-bar
+@demo demo/index.html
+-->
+<dom-module id="material-progress-bars">
+  <template>
+    <style>
+      :host {
+        display: block;
+        -webkit-transform: translatez(0);
+        -moz-transform: translatez(0);
+        -ms-transform: translatez(0);
+        -o-transform: translatez(0);
+        transform: translatez(0);
+        background-color: var(--material-progress-bar-background-color, #E0E0E0);
+      }
+      :host,
+      :host > ::content > * {
+        height: var(--material-progress-bar-height);
+        border-radius: calc(var(--material-progress-bar-height) / 2);
+      }
+      :host > ::content > * {
+        float: left;
+        position: relative;
+        @apply(--layout-inline);
+        @apply(--layout-horizontal-reverse);
+        @apply(--layout-center);
+        background-color: #FF5732;
+      }
+      :host > ::content > *:not(:first-child) {
+        border-radius: 0 calc(var(--material-progress-bar-height) / 2) calc(var(--material-progress-bar-height) / 2) 0;
+        margin-left: calc(-var(--material-progress-bar-height) / 2);
+      }
+      :host > ::content > * > * {
+        float: right;
+        color: #FFFFFF;
+      }
+      :host > ::content > * > iron-icon {
+        height: calc(var(--material-progress-bar-height) * 2/3 - 1px);
+        width: calc(var(--material-progress-bar-height) * 2/3);
+        margin-right: calc(var(--material-progress-bar-height) * 1/6);
+      }
+      :host > ::content > * > span {
+        margin: 0 calc(var(--material-progress-bar-height) * 1/3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        opacity: 1;
+      }
+      :host > ::content > *:not(:first-child) > span {
+        margin: 0 calc(var(--material-progress-bar-height) * 1/3) 0 calc(var(--material-progress-bar-height) * 5/6);
+      }
+      :host > ::content > *:nth-child(4n+2) {
+        background-color: #9c27b0;
+      }
+      :host > ::content > *:nth-child(4n+3) {
+        background-color: #00bcd4;
+      }
+      :host > ::content > *:nth-child(4n+4) {
+        background-color: #ff9800;
+      }
+    </style>
+    <content id="content" selector=".bar[value]"></content>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+    Polymer({
+      is: 'material-progress-bars',
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
+      properties: {
+        /**
+         * Maximum value represented by all progress bars.
+         * Bars will be scaled according to their `value` attribute
+         * and this maximum.
+         */
+        max: {
+          type: Number,
+          value: 100,
+          observer: '_refresh'
+        },
+        /**
+         * Sum of all the values of the bars.
+         */
+        sum: {
+          type: Number,
+          value: 0,
+          notify: true,
+          readOnly: true,
+          reflectToAttribute: true
+        },
+        /**
+         * Height of the bar and bars, in pixels.
+         */
+        barHeight: {
+          type: Number,
+          value: 22,
+          observer: '_refresh'
+        }
+      },
+      listeners: {
+        'iron-resize': '_onResize'
+      },
+      ready: function() {
+        this._mutationObserver = new MutationObserver(this._observeChildrenMutations.bind(this));
+        this._mutationObserver.observe(this, {
+          childList: true,
+          attributes: true,
+          subtree: true
+        });
+        this.async(function() {
+          this._refresh();
+        }, 100);
+      },
+      detached: function() {
+        this._mutationObserver.disconnect();
+        this._mutationObserver = null;
+      },
+      _refresh: function() {
+        var actualMax = Math.max(this._computeSum(), this.max),
+        width = this.clientWidth,
+        nodes = Polymer.dom(this.$.content).getDistributedNodes();
+        var barCount = 0;
+        for (var node, index = 0; node = nodes[index]; index++) {
+          if (node && node.getAttribute) {
+            var val = node.getAttribute('value');
+            if (!isNaN(val)) {
+              var length = this._getSizeForValue(Number(val), actualMax, width);
+              node.style.width = (length + (barCount > 0 ? this.barHeight / 2 : 0)) + 'px';
+              node.style.zIndex = nodes.length - barCount;
+              barCount++;
+            }
+          }
+        }
+        if (!this._oldBarHeight || this._oldBarHeight !== this.barHeight) {
+          this.customStyle['--material-progress-bar-height'] = this.barHeight + 'px';
+          this.updateStyles();
+          this._oldBarHeight = this.barHeight;
+        }
+      },
+      _computeSum: function() {
+        var _sum = 0,
+        nodes = Polymer.dom(this.$.content).getDistributedNodes();
+        for (var node, index = 0; node = nodes[index]; index++) {
+          if (node && node.getAttribute) {
+            var val = node.getAttribute('value');
+            if (!isNaN(val)) {
+              _sum += Number(val);
+            }
+          }
+        }
+        this._setSum(_sum); 
+        return _sum;
+      },
+      _getSizeForValue: function(value, max, width) {
+        console.log('_getSizeForValue', value, max, width, Math.floor(value / max * width * 100) / 100);
+        return Math.floor(value / max * width * 100) / 100;
+      },
+      _observeChildrenMutations: function(mutations) {
+        var needsUpdate = mutations.some(function (m) {
+          if (m.target.parentElement && m.target.parentElement.localName == 'material-progress-bars' && m.type === 'attributes' && m.attributeName !== 'style') {
+            return true;
+          }
+          return false;
+        });
+        if (needsUpdate) {
+          this._refresh();
+        }
+      },
+      _onResize: function() {
+        this.debounce('_onResize', function() {
+          this._refresh();
+        }, 10);
+      }
+    });
+  })();
+  </script>
+</dom-module>

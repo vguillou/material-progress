@@ -1,0 +1,45 @@
+{
+  "name": "material-progress",
+  "version": "0.0.1",
+  "authors": [
+    "Vincent Guillou <vin.guillou@gmail.com>"
+  ],
+  "description": "A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer. WIP!",
+  "keywords": [
+    "progress bar",
+    "progress",
+    "bar",
+    "material",
+    "material design",
+    "google fit",
+    "web-components",
+    "web-component",
+    "web components",
+    "web component",
+    "polymer"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "res",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vguillou/material-progress.git"
+  },
+  "homepage": "https://vguillou.github.io/webcomponents/material-progress",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.3",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5",
+    "iron-icon": "PolymerElements/iron-icon#^1.0.7",
+    "iron-icons": "PolymerElements/iron-icons#^1.0.4"
+  }
+}
