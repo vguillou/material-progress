@@ -2,7 +2,7 @@
 
 _A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer. WIP!_
 
-![material-progress-bars screenshot](/res/material-progress-bars.png?raw=true "material-progress-bars")
+<img src="./res/material-progress-bars.png" alt="material-progress-bars screenshot" width="436">
 
 ## Use it in your project :
 
