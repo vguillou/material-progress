@@ -43,7 +43,7 @@ Custom property | Description | Default
   <template>
     <style>
       :host {
-        display: block;
+        display: flex;
         overflow: hidden;
         -webkit-transform: translatez(0);
         -moz-transform: translatez(0);
@@ -64,7 +64,6 @@ Custom property | Description | Default
         @apply(--layout-horizontal-reverse);
         @apply(--layout-center);
         background-color: #FF5732;
-        min-width: var(--material-progress-bar-height);
       }
       :host([animated]) > ::content > * {
         -webkit-transition: width 850ms cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -72,6 +71,9 @@ Custom property | Description | Default
         -moz-transition: width 850ms cubic-bezier(0.4, 0.0, 0.2, 1);
         -o-transition: width 850ms cubic-bezier(0.4, 0.0, 0.2, 1);
         transition: width 850ms cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+      :host > ::content > *:first-child {
+        min-width: var(--material-progress-bar-height);
       }
       :host > ::content > *:not(:first-child) {
         border-radius: 0 calc(var(--material-progress-bar-height) / 2) calc(var(--material-progress-bar-height) / 2) 0;
