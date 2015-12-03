@@ -40,6 +40,7 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5",
     "iron-icon": "PolymerElements/iron-icon#^1.0.7",
-    "iron-icons": "PolymerElements/iron-icons#^1.0.4"
+    "iron-icons": "PolymerElements/iron-icons#^1.0.4",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.13"
   }
 }

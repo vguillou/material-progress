@@ -6,12 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="msapplication-TileColor" content="#f44336">
-  <meta name="theme-color" content="#f44336">
+  <meta name="msapplication-TileColor" content="#ff5722">
+  <meta name="theme-color" content="#ff5722">
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../../iron-flex-layout/classes/iron-flex-layout.html">
   <link rel="import" href="../../iron-icons/maps-icons.html">
+  <link rel="import" href="../../paper-styles/color.html">
+  <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../material-progress-bars.html">
 
   <style is="custom-style">
@@ -23,11 +25,24 @@
 
     material-progress-bars {
       margin: 16px;
+      @apply(--paper-font-body2);
     }
     material-progress-bars > .bar > span {
       @apply(--layout-flex);
       text-align: end;
       font-size: 0.9em;
+    }
+    .bar {
+      background-color: var(--paper-deep-orange-500);
+    }
+    .bar.run {
+      background-color: var(--paper-purple-500);
+    }
+    .bar.hello {
+      background-color: var(--paper-cyan-500);
+    }
+    .bar.world {
+      background-color: var(--paper-orange-500);
     }
   </style>
   
@@ -36,18 +51,21 @@
   <template is="dom-bind" id="demo">
 
     <material-progress-bars max="128" bar-height="22" animated>
-      <div class="bar" value="21">
+      <div class="bar" value="21" legend="Walk">
         <iron-icon icon="maps:directions-walk"></iron-icon>
       </div>
-      <div class="bar" value="13" icon="maps:directions-bike">
+      <div class="bar run" value="13" legend="Run">
         <iron-icon icon="maps:directions-run"></iron-icon>
       </div>
-      <div class="bar" value="50">
+      <div class="bar hello" value="50" legend="Hello">
         <iron-icon icon="maps:directions-bike"></iron-icon>
         <span>Hello</span>
       </div>
-      <div class="bar" value="30">
+      <div class="bar world" value="30" legend="World">
         <span>World</span>
+      </div>
+      <div class="bar" value="0" legend="Invisible !">
+        <span>Invisible !</span>
       </div>
     </material-progress-bars>
 
