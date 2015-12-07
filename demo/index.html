@@ -22,7 +22,10 @@
       font-family: 'Roboto', sans-serif;
       margin: 0;
     }
-
+    div.demo-inputs,
+    div.demo-inputs > span {
+      margin: 8px;
+    }
     material-progress-bars {
       margin: 16px;
       @apply(--paper-font-body2);
@@ -50,29 +53,83 @@
 
   <template is="dom-bind" id="demo">
 
-    <material-progress-bars max="128" bar-height="22" animated>
-      <div class="bar" value="21" legend="Walk">
+    <material-progress-bars id="mpb1" max="128" bar-height="22" animated on-tap="test" legend-label="Legend:">
+      <div class="bar" data-value="21" data-legend="Walk">
         <iron-icon icon="maps:directions-walk"></iron-icon>
       </div>
-      <div class="bar run" value="13" legend="Run">
+      <div class="bar run" data-value="13" data-legend="Run">
         <iron-icon icon="maps:directions-run"></iron-icon>
       </div>
-      <div class="bar hello" value="50" legend="Hello">
+      <div class="bar hello" data-value="50" data-legend="Hello">
         <iron-icon icon="maps:directions-bike"></iron-icon>
         <span>Hello</span>
       </div>
-      <div class="bar world" value="30" legend="World">
+      <div class="bar world" data-value="30" data-legend="World">
         <span>World</span>
       </div>
-      <div class="bar" value="0" legend="Invisible !">
+      <div class="bar" data-value="0" data-legend="Invisible !">
         <span>Invisible !</span>
       </div>
     </material-progress-bars>
+
+    <hr>
+
+    <material-progress-bars id="mpb2" max="100" bar-height="22" animated legend-label="Legend:">
+      <div id="bar1" class="bar" data-value="14" data-legend="bar 1">
+        <iron-icon icon="maps:directions-walk"></iron-icon>
+        <span>bar 1</span>
+      </div>
+      <div id="bar2" class="bar run" data-value="9" data-legend="bar 2">
+        <iron-icon icon="maps:directions-run"></iron-icon>
+        <span>bar 2</span>
+      </div>
+      <div id="bar3" class="bar hello" data-value="50" data-legend="bar 3">
+        <iron-icon icon="maps:directions-bike"></iron-icon>
+        <span>bar 3</span>
+      </div>
+      <div id="bar4" class="bar world" data-value="20" data-legend="bar 4">
+        <span>bar 4</span>
+      </div>
+      <div id="bar5" class="bar" data-value="0" data-legend="Invisible !">
+        <span>Invisible !</span>
+      </div>
+    </material-progress-bars>
+
+    <div class="demo-inputs">
+      <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
+      <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
+    </div>
+    <div class="demo-inputs">
+      <span>bar1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
+      <span>bar2: <input id="ibar2" type="number" value="9" onchange="inputChange()"></span>
+      <span>bar3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
+      <span>bar4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
+    </div>
 
   </template>
 
   <script>
     var demo = document.querySelector('#demo');
+    var i = 0;
+    var mpb1;
+    demo.test = function() {
+      mpb1 = demo.$.mpb1;
+      mpb1.customStyle['--material-progress-bars-style'] = i%2 === 1 ? 'width: 100%;' : 'width: 50%;' ;
+      i++;
+      mpb1.updateStyles();
+    };
+
+    function inputChange() {
+      var mpb2 = demo.$.mpb2;
+      demo.async(function() {
+        mpb2.max = Number(demo.$.imax.value);
+        mpb2.barHeight = Number(demo.$.iheight.value);
+        demo.$.bar1.setAttribute('data-value', Number(demo.$.ibar1.value));
+        demo.$.bar2.setAttribute('data-value', Number(demo.$.ibar2.value));
+        demo.$.bar3.setAttribute('data-value', Number(demo.$.ibar3.value));
+        demo.$.bar4.setAttribute('data-value', Number(demo.$.ibar4.value));
+      }, 100);
+    }
   </script>
 
 </body>

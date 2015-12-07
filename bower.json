@@ -33,8 +33,7 @@
   },
   "homepage": "https://vguillou.github.io/webcomponents/material-progress",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2.3",
-    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.2"
+    "polymer": "Polymer/polymer#^1.2.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
