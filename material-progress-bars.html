@@ -1,9 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer. WIP!
+A Material design multi-progress bar, inspired by Google Fit.
+
 Add nodes (typically divs) in the element light DOM with the `bar` CSS class
-and a decimal `value` attribute to add progress bars.
+and a decimal `data-value` attribute to add progress bars.
 
 Note that these bars have a rtl (right to left) layout by default, in order to end-justify its
 children (Google Fit style).
@@ -26,8 +27,7 @@ Example:
       </div>
     </material-progress-bars>
 
-
-### Child bars API
+### Children bars API
 
 The direct children of a &lt;material-progress-bars&gt; element represent the different bars to display.
 
@@ -35,8 +35,8 @@ The following attributes are available to control their behavior:
 
 Attribute | Description | Default
 ----------------|-------------|----------
-`data-value` | The required value represented by the bar. Must not be `undefined` or `0`for the bar to be displayed. | `undefined`
-`data-legend`| An optional `String`to be displayed in the legend. | `undefined`
+`data-value` | The required value represented by the bar. Must not be `undefined` or `0` for the bar to be displayed. | `undefined`
+`data-legend` | An optional `String` to be displayed in the legend. | `undefined`
 
 
 ### Styling
@@ -46,8 +46,8 @@ The following custom properties and mixins are available for styling:
 Custom property | Description | Default
 ----------------|-------------|----------
 `--material-progress-bar-background-color` | Background color of the whole progress bar. | `#E0E0E0`
-`--material-progress-bars-style`| Mixin applied to the progress bar container. | `{}`
-`--material-progress-bars-legend-style`| Mixin applied to the legend. | `{}`
+`--material-progress-bars-style` | Mixin applied to the progress bar container. | `{}`
+`--material-progress-bars-legend-style` | Mixin applied to the legend. | `{}`
 
 @group material-progress
 @element material-progress-bar
@@ -150,7 +150,7 @@ Custom property | Description | Default
       properties: {
         /**
          * Maximum value represented by all progress bars.
-         * Bars will be scaled according to their `value` attribute
+         * Bars will be scaled according to their `data-value` attribute
          * and this maximum.
          */
         max: {
@@ -160,6 +160,8 @@ Custom property | Description | Default
         },
         /**
          * Sum of all the values of the bars.
+         *
+         * @type {Number}
          */
         sum: {
           type: Number,
@@ -194,6 +196,8 @@ Custom property | Description | Default
       },
       /**
        * Array of all the bar nodes.
+       * 
+       * @return {Array}
        */
       getBars: function() {
         return Polymer.dom(this.$.content).getDistributedNodes();
