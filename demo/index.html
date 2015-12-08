@@ -15,6 +15,7 @@
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../material-progress-bars.html">
+  <link rel="import" href="../material-progress-histo.html">
 
   <style is="custom-style">
     html,
@@ -27,9 +28,13 @@
       margin: 8px;
     }
     hr {
-      margin: 32px 0;
+      margin-top: 32px;
     }
-    material-progress-bars {
+    p {
+      margin: 16px;
+    }
+    material-progress-bars,
+    material-progress-histo {
       margin: 16px;
       @apply(--paper-font-body2);
     }
@@ -55,7 +60,7 @@
 <body unresolved>
 
   <template is="dom-bind" id="demo">
-
+    <p>material-progress-bars</p>
     <material-progress-bars id="mpb1" max="128" bar-height="22" animated on-tap="test">
       <div class="bar" data-value="21">
         <iron-icon icon="maps:directions-walk"></iron-icon>
@@ -76,7 +81,7 @@
     </material-progress-bars>
 
     <hr>
-
+    <p>material-progress-bars</p>
     <material-progress-bars id="mpb2" max="100" bar-height="22" bars="{{bars}}" animated legend-label="Legend:">
       <div id="bar1" class="bar" data-value="14" data-legend="bar 1">
         <iron-icon icon="maps:directions-walk"></iron-icon>
@@ -106,6 +111,27 @@
       <span>bar3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
       <span>bar4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
     </div>
+
+    <hr>
+    <p>material-progress-histo</p>
+    <material-progress-histo id="mph1" max="128" bar-height="22" animated on-tap="test">
+      <div class="bar" data-value="21">
+        <iron-icon icon="maps:directions-walk"></iron-icon>
+      </div>
+      <div class="bar run" data-value="13">
+        <iron-icon icon="maps:directions-run"></iron-icon>
+      </div>
+      <div class="bar hello" data-value="50">
+        <iron-icon icon="maps:directions-bike"></iron-icon>
+        <span>Hello</span>
+      </div>
+      <div class="bar world" data-value="30">
+        <span>World</span>
+      </div>
+      <div class="bar" data-value="0">
+        <span>Invisible because my data-value="0" !</span>
+      </div>
+    </material-progress-histo>
 
   </template>
 
