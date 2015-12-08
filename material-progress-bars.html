@@ -156,7 +156,7 @@ Custom property | Description | Default
         max: {
           type: Number,
           value: 100,
-          observer: 'refresh'
+          observer: '_refresh'
         },
         /**
          * Sum of all the values of the bars.
@@ -176,7 +176,7 @@ Custom property | Description | Default
         barHeight: {
           type: Number,
           value: 22,
-          observer: 'refresh'
+          observer: '_refresh'
         },
         /**
          * Animate when the size of a bar changes.
@@ -191,25 +191,27 @@ Custom property | Description | Default
          */
         legendLabel: {
           type: String,
-          value: ''
+          value: '',
+          observer: '_refresh'
+        },
+        /**
+         * Array of all the bar nodes.
+         * 
+         * @type {Array}
+         */
+        bars: {
+          type: Array,
+          notify: true,
+          readOnly: true
         }
-      },
-      /**
-       * Array of all the bar nodes.
-       * 
-       * @return {Array}
-       */
-      getBars: function() {
-        return Polymer.dom(this.$.content).getDistributedNodes();
       },
       /**
        * Refresh the element.
        */
       refresh: function() {
         if (this._attached) {
-          var realMax = Math.max(this._computeSumAndBarCount(), this.max),
-          bars = this.getBars(), i = 0, barMeta,
-          animationDelay = 600 / (this._barCount - 1);
+          var realMax = Math.max(this._computeSumAndBars(), this.max),
+          barMeta, i = 0, animationDelay = 600 / (this.bars.length - 1);
 
           // Legend initialization
           if (!this._legendItems) {
@@ -222,8 +224,8 @@ Custom property | Description | Default
           }
 
           // Computing each bar
-          if (bars) {
-            bars.forEach(function(bar) {
+          if (this.bars) {
+            this.bars.forEach(function(bar) {
               barMeta = this._getBarMeta(bar);
               if (!isNaN(barMeta.value)) {
                 this.toggleClass('visible', barMeta.value > 0, bar);
@@ -255,10 +257,8 @@ Custom property | Description | Default
         this._mutationObserver.observe(this, {childList: true, attributes: true, subtree: true});
       },
       attached: function() {
-        this.async(function() {
-          this.refresh();
-        }, 100);
         this._attached = true;
+        this._refresh();
       },
       detached: function() {
         if (this._mutationObserver) {
@@ -266,11 +266,14 @@ Custom property | Description | Default
           this._mutationObserver = null;
         }
       },
-      _computeSumAndBarCount: function() {
-        var __sum = 0, __barCount = 0,
-        bars = this.getBars();
-        if (bars) {
-          bars.forEach(function(bar) {
+      _refresh: function() {
+        this.debounce('refresh', this.refresh, 10);
+      },
+      _computeSumAndBars: function() {
+        var __sum = 0, __barCount = 0;
+        this._setBars(Polymer.dom(this.$.content).getDistributedNodes());
+        if (this.bars) {
+          this.bars.forEach(function(bar) {
             var val = this._getBarMeta(bar).value;
             if (!isNaN(val) && Number(val) > 0) {
               __barCount++;
@@ -316,7 +319,7 @@ Custom property | Description | Default
           return false;
         });
         if (needsUpdate) {
-          this.refresh();
+          this._refresh();
         }
       }
     });
