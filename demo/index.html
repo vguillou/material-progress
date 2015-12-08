@@ -77,7 +77,7 @@
 
     <hr>
 
-    <material-progress-bars id="mpb2" max="100" bar-height="22" animated legend-label="Legend:">
+    <material-progress-bars id="mpb2" max="100" bar-height="22" bars="{{bars}}" animated legend-label="Legend:">
       <div id="bar1" class="bar" data-value="14" data-legend="bar 1">
         <iron-icon icon="maps:directions-walk"></iron-icon>
         <span>bar 1</span>
@@ -93,18 +93,16 @@
       <div id="bar4" class="bar world" data-value="20" data-legend="bar 4">
         <span>bar 4</span>
       </div>
-      <div id="bar5" class="bar" data-value="0" data-legend="Invisible !">
-        <span>Invisible !</span>
-      </div>
     </material-progress-bars>
 
     <div class="demo-inputs">
       <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
       <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
+      <span>bars count: [[bars.length]]</span>
     </div>
     <div class="demo-inputs">
       <span>bar1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
-      <span>bar2: <input id="ibar2" type="number" value="9" onchange="inputChange()"></span>
+      <span>bar2: <input id="ibar2" type="number" value="9"  onchange="inputChange()"></span>
       <span>bar3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
       <span>bar4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
     </div>
