@@ -26,6 +26,9 @@
     div.demo-inputs > span {
       margin: 8px;
     }
+    hr {
+      margin: 32px 0;
+    }
     material-progress-bars {
       margin: 16px;
       @apply(--paper-font-body2);
@@ -53,22 +56,22 @@
 
   <template is="dom-bind" id="demo">
 
-    <material-progress-bars id="mpb1" max="128" bar-height="22" animated on-tap="test" legend-label="Legend:">
-      <div class="bar" data-value="21" data-legend="Walk">
+    <material-progress-bars id="mpb1" max="128" bar-height="22" animated on-tap="test">
+      <div class="bar" data-value="21">
         <iron-icon icon="maps:directions-walk"></iron-icon>
       </div>
-      <div class="bar run" data-value="13" data-legend="Run">
+      <div class="bar run" data-value="13">
         <iron-icon icon="maps:directions-run"></iron-icon>
       </div>
-      <div class="bar hello" data-value="50" data-legend="Hello">
+      <div class="bar hello" data-value="50">
         <iron-icon icon="maps:directions-bike"></iron-icon>
         <span>Hello</span>
       </div>
-      <div class="bar world" data-value="30" data-legend="World">
+      <div class="bar world" data-value="30">
         <span>World</span>
       </div>
-      <div class="bar" data-value="0" data-legend="Invisible !">
-        <span>Invisible !</span>
+      <div class="bar" data-value="0">
+        <span>Invisible because my data-value="0" !</span>
       </div>
     </material-progress-bars>
 
