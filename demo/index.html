@@ -98,55 +98,35 @@
       <div id="bar4" class="bar world" data-value="20" data-legend="bar 4">
         <span>bar 4</span>
       </div>
+      <template is="dom-repeat" items="[[mpb2_bars]]">
+        <div class="bar" data-value="10" data-legend$="[[item]]">
+          <span>[[item]]</span>
+        </div>
+      </template>
     </material-progress-bars>
 
     <div class="demo-inputs">
       <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
       <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
       <span>bars count: [[bars.length]]</span>
+      <span>
+        <button on-tap="mpb2AddBar">+ Add bar</button>
+        <button on-tap="mpb2RemoveBar">- Remove bar</button>
+      </span>
     </div>
     <div class="demo-inputs">
-      <span>bar1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
-      <span>bar2: <input id="ibar2" type="number" value="9"  onchange="inputChange()"></span>
-      <span>bar3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
-      <span>bar4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
+      <span>bar1: <input id="ibar1" type="number" value="14" onchange="mpb2InputChange()"></span>
+      <span>bar2: <input id="ibar2" type="number" value="9"  onchange="mpb2InputChange()"></span>
+      <span>bar3: <input id="ibar3" type="number" value="50" onchange="mpb2InputChange()"></span>
+      <span>bar4: <input id="ibar4" type="number" value="20" onchange="mpb2InputChange()"></span>
     </div>
-
-    <hr>
-    <p>material-progress-histo</p>
-    <material-progress-histo id="mph1" max="128" bar-height="22" animated on-tap="test">
-      <div class="bar" data-value="21">
-        <iron-icon icon="maps:directions-walk"></iron-icon>
-      </div>
-      <div class="bar run" data-value="13">
-        <iron-icon icon="maps:directions-run"></iron-icon>
-      </div>
-      <div class="bar hello" data-value="50">
-        <iron-icon icon="maps:directions-bike"></iron-icon>
-        <span>Hello</span>
-      </div>
-      <div class="bar world" data-value="30">
-        <span>World</span>
-      </div>
-      <div class="bar" data-value="0">
-        <span>Invisible because my data-value="0" !</span>
-      </div>
-    </material-progress-histo>
 
   </template>
 
   <script>
     var demo = document.querySelector('#demo');
-    var i = 0;
-    var mpb1;
-    demo.test = function() {
-      mpb1 = demo.$.mpb1;
-      mpb1.customStyle['--material-progress-bars-style'] = i%2 === 1 ? 'width: 100%;' : 'width: 50%;' ;
-      i++;
-      mpb1.updateStyles();
-    };
 
-    function inputChange() {
+    function mpb2InputChange() {
       var mpb2 = demo.$.mpb2;
       demo.async(function() {
         mpb2.max = Number(demo.$.imax.value);
@@ -157,6 +137,17 @@
         demo.$.bar4.setAttribute('data-value', Number(demo.$.ibar4.value));
       }, 100);
     }
+
+    demo.mpb2_bars = [];
+    demo.mpb2AddBar = function() {
+      demo.push('mpb2_bars', 'bar ' + (demo.mpb2_bars.length + 5));
+    };
+
+    demo.mpb2RemoveBar = function() {
+      if (demo.mpb2_bars.length > 0) {
+        var removed = demo.pop('mpb2_bars');
+      }
+    };
   </script>
 
 </body>
