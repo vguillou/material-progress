@@ -82,9 +82,10 @@ Custom property | Description | Default
         @apply(--layout-center);
         float: left;
         position: relative;
-        width: 0px;
         margin-left: calc(-var(--material-progress-bar-height) / 2);
         border-radius: 0 calc(var(--material-progress-bar-height) / 2) calc(var(--material-progress-bar-height) / 2) 0;
+        width: 0px;
+        z-index: 0;
       }
       :host([animated]) > #barsContainer > ::content > * {
         -webkit-transition: width 850ms cubic-bezier(0.4, 0.0, 0.2, 1), z-index 0ms 850ms;
@@ -314,14 +315,13 @@ Custom property | Description | Default
         return legendItems && legendItems.length > 0;
       },
       _observeChildrenMutations: function(mutations) {
+        var t, relevantMut = false;
         var needsUpdate = mutations.some(function (m) {
-          var node = Polymer.dom(m.target);
-          if (node && node.parentElement === this && m.type === 'attributes' && 
-            (m.attributeName === 'data-value' || m.attributeName === 'data-legend')) {
-            return true;
-          }
-          return false;
-        });
+          t = m.target;
+          relevantMut = m.type === 'attributes' && t && (t.parentElement === this || t.parentElement === this.$.barsContainer) && (m.attributeName === 'data-value' || m.attributeName === 'data-legend');
+          relevantMut = relevantMut || (m.type === 'childList' && (t === this || t === this.$.barsContainer));
+          return relevantMut;
+        }, this);
         if (needsUpdate) {
           this._refresh();
         }
