@@ -47,7 +47,8 @@ Custom property | Description | Default
 ----------------|-------------|----------
 `--material-progress-bar-background-color` | Background color of the whole progress bar. | `#E0E0E0`
 `--material-progress-bars-style` | Mixin applied to the progress bar container. | `{}`
-`--material-progress-bars-legend-style` | Mixin applied to the legend. | `{}`
+`--material-progress-bars-legend-style` | Mixin applied to the legend's container. | `{}`
+`--material-progress-bars-legend-item-style` | Mixin applied to each legend item. | `{}`
 
 @group material-progress
 @element material-progress-bar
@@ -133,6 +134,8 @@ Custom property | Description | Default
       }
       :host > .legend > span {
         margin: 0 8px;
+        white-space: nowrap;
+        @apply(--material-progress-bars-legend-item-style);
       }
     </style>
     <div id="barsContainer">
