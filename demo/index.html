@@ -15,7 +15,6 @@
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../material-progress-bars.html">
-  <link rel="import" href="../material-progress-histo.html">
 
   <style is="custom-style">
     html,
@@ -106,8 +105,8 @@
     </material-progress-bars>
 
     <div class="demo-inputs">
-      <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
-      <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
+      <span>max: <input id="imax" type="number" value="100" onchange="mpb2InputChange()"></span>
+      <span>bar height: <input id="iheight" type="number" value="22" onchange="mpb2InputChange()"></span>
       <span>bars count: [[bars.length]]</span>
       <span>
         <button on-tap="mpb2AddBar">+ Add bar</button>
