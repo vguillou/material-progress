@@ -15,6 +15,7 @@
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../material-progress-bars.html">
+  <link rel="import" href="../material-progress-histo.html">
 
   <style is="custom-style">
     html,
@@ -29,12 +30,20 @@
     hr {
       margin-top: 32px;
     }
-    p {
-      margin: 16px;
+    h3, .title-container {
+      margin: 32px 16px 16px 16px;
+    }
+    .title-container {
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+    }
+    .title-container > * {
+      margin-right: 32px
     }
     material-progress-bars,
     material-progress-histo {
       margin: 16px;
+      max-width: 900px;
       @apply(--paper-font-body2);
     }
     material-progress-bars > .bar > span {
@@ -59,7 +68,7 @@
 <body unresolved>
 
   <template is="dom-bind" id="demo">
-    <p>material-progress-bars</p>
+    <h3>material-progress-bars</h3>
     <material-progress-bars id="mpb1" max="128" bar-height="22" animated on-tap="test">
       <div class="bar" data-value="21">
         <iron-icon icon="maps:directions-walk"></iron-icon>
@@ -80,71 +89,132 @@
     </material-progress-bars>
 
     <hr>
-    <p>material-progress-bars</p>
-    <material-progress-bars id="mpb2" max="100" bar-height="22" bars="{{bars}}" animated legend-label="Legend:">
-      <div id="bar1" class="bar" data-value="14" data-legend="bar 1">
+    <h3>material-progress-histo</h3>
+    <material-progress-histo id="mph1" bar-height="22" animated on-tap="test">
+      <div class="bar" data-value="21">
+        <iron-icon icon="maps:directions-walk"></iron-icon>
+      </div>
+      <div class="bar run" data-value="13">
+        <iron-icon icon="maps:directions-run"></iron-icon>
+      </div>
+      <div class="bar hello" data-value="50">
+        <iron-icon icon="maps:directions-bike"></iron-icon>
+        <span>Hello</span>
+      </div>
+      <div class="bar world" data-value="30">
+        <span>World</span>
+      </div>
+      <div class="bar" data-value="0">
+        <span>Invisible because my data-value="0" !</span>
+      </div>
+    </material-progress-histo>
+
+    <hr>
+    <h3>Interactive demo</h3>
+
+    <div class="demo-inputs">
+      <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
+      <span>legend label: <input id="ilegend" value="Legend:" onchange="inputChange()"></span>
+      <span>
+        <button on-tap="addBar">+ Add bar</button>
+        <button on-tap="removeBar">- Remove bar</button>
+      </span>
+    </div>
+    <div class="demo-inputs">
+      <span>bar 1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
+      <span>bar 2: <input id="ibar2" type="number" value="9"  onchange="inputChange()"></span>
+      <span>bar 3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
+      <span>bar 4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
+    </div>
+
+    <div class="title-container">
+      <p>material-progress-bars</p>
+      <span>bars count: [[mpb2Bars.length]]</span>
+      <span>sum: [[mpb2Sum]]</span>
+      <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
+    </div>
+    <material-progress-bars id="mpb2" max="[[max]]" bar-height="[[barHeight]]" bars="{{mpb2Bars}}" sum="{{mpb2Sum}}" animated legend-label="{{legendLabel}}">
+      <div class="bar" data-value$="[[bar1Value]]" data-legend="bar 1">
         <iron-icon icon="maps:directions-walk"></iron-icon>
         <span>bar 1</span>
       </div>
-      <div id="bar2" class="bar run" data-value="9" data-legend="bar 2">
+      <div id="mpb2Bar2" class="bar run" data-value$="[[bar2Value]]" data-legend="bar 2">
         <iron-icon icon="maps:directions-run"></iron-icon>
         <span>bar 2</span>
       </div>
-      <div id="bar3" class="bar hello" data-value="50" data-legend="bar 3">
+      <div id="mpb2Bar3" class="bar hello" data-value$="[[bar3Value]]" data-legend="bar 3">
         <iron-icon icon="maps:directions-bike"></iron-icon>
         <span>bar 3</span>
       </div>
-      <div id="bar4" class="bar world" data-value="20" data-legend="bar 4">
+      <div id="mpb2Bar4" class="bar world" data-value$="[[bar4Value]]" data-legend="bar 4">
         <span>bar 4</span>
       </div>
-      <template is="dom-repeat" items="[[mpb2_bars]]">
+      <template is="dom-repeat" items="[[extraBars]]">
         <div class="bar" data-value="10" data-legend$="[[item]]">
           <span>[[item]]</span>
         </div>
       </template>
     </material-progress-bars>
 
-    <div class="demo-inputs">
-      <span>max: <input id="imax" type="number" value="100" onchange="mpb2InputChange()"></span>
-      <span>bar height: <input id="iheight" type="number" value="22" onchange="mpb2InputChange()"></span>
-      <span>bars count: [[bars.length]]</span>
-      <span>
-        <button on-tap="mpb2AddBar">+ Add bar</button>
-        <button on-tap="mpb2RemoveBar">- Remove bar</button>
-      </span>
+    <div class="title-container">
+      <p>material-progress-histo</p>
+      <span>bars count: [[mph2Bars.length]]</span>
+      <span>sum: [[mph2Sum]]</span>
+      <span><input id="iscaletosum" type="checkbox" onchange="inputChange()"> scale-to-sum</span>
     </div>
-    <div class="demo-inputs">
-      <span>bar1: <input id="ibar1" type="number" value="14" onchange="mpb2InputChange()"></span>
-      <span>bar2: <input id="ibar2" type="number" value="9"  onchange="mpb2InputChange()"></span>
-      <span>bar3: <input id="ibar3" type="number" value="50" onchange="mpb2InputChange()"></span>
-      <span>bar4: <input id="ibar4" type="number" value="20" onchange="mpb2InputChange()"></span>
-    </div>
+    <material-progress-histo id="mph2" scale-to-sum$="[[scaleToSum]]" bar-height="[[barHeight]]" bars="{{mph2Bars}}" sum="{{mph2Sum}}" animated legend-label="{{legendLabel}}">
+      <div class="bar" data-value$="[[bar1Value]]" data-legend="bar 1">
+        <iron-icon icon="maps:directions-walk"></iron-icon>
+        <span>bar 1</span>
+      </div>
+      <div id="mph2Bar2" class="bar run" data-value$="[[bar2Value]]" data-legend="bar 2">
+        <iron-icon icon="maps:directions-run"></iron-icon>
+        <span>bar 2</span>
+      </div>
+      <div id="mph2Bar3" class="bar hello" data-value$="[[bar3Value]]" data-legend="bar 3">
+        <iron-icon icon="maps:directions-bike"></iron-icon>
+        <span>bar 3</span>
+      </div>
+      <div id="mph2Bar4" class="bar world" data-value$="[[bar4Value]]" data-legend="bar 4">
+        <span>bar 4</span>
+      </div>
+      <template is="dom-repeat" items="[[extraBars]]">
+        <div class="bar" data-value="10" data-legend$="[[item]]">
+          <span>[[item]]</span>
+        </div>
+      </template>
+    </material-progress-histo>
 
   </template>
 
   <script>
     var demo = document.querySelector('#demo');
+    demo.extraBars = [];
 
-    function mpb2InputChange() {
-      var mpb2 = demo.$.mpb2;
+    demo.addEventListener('dom-change', function() {
+      inputChange();
+    });
+
+    function inputChange() {
       demo.async(function() {
-        mpb2.max = Number(demo.$.imax.value);
-        mpb2.barHeight = Number(demo.$.iheight.value);
-        demo.$.bar1.setAttribute('data-value', Number(demo.$.ibar1.value));
-        demo.$.bar2.setAttribute('data-value', Number(demo.$.ibar2.value));
-        demo.$.bar3.setAttribute('data-value', Number(demo.$.ibar3.value));
-        demo.$.bar4.setAttribute('data-value', Number(demo.$.ibar4.value));
+        demo.max = Number(demo.$.imax.value);
+        demo.scaleToSum = demo.$.iscaletosum.checked;
+        demo.barHeight = Number(demo.$.iheight.value);
+        demo.legendLabel = demo.$.ilegend.value;
+        demo.bar1Value = Number(demo.$.ibar1.value);
+        demo.bar2Value = Number(demo.$.ibar2.value);
+        demo.bar3Value = Number(demo.$.ibar3.value);
+        demo.bar4Value = Number(demo.$.ibar4.value);
       }, 100);
     }
 
-    demo.mpb2_bars = [];
-    demo.mpb2AddBar = function() {
-      demo.push('mpb2_bars', 'bar ' + (demo.mpb2_bars.length + 5));
+    demo.addBar = function() {
+      demo.push('extraBars', 'bar ' + (demo.extraBars.length + 5));
     };
 
-    demo.mpb2RemoveBar = function() {
-      if (demo.mpb2_bars.length > 0) {
-        var removed = demo.pop('mpb2_bars');
+    demo.removeBar = function() {
+      if (demo.extraBars.length > 0) {
+        var removed = demo.pop('extraBars');
       }
     };
   </script>
