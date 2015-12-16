@@ -3,6 +3,11 @@
 <script>
 (function() {
   'use strict';
+  /**
+   * `Polymer.MaterialProgressBehavior` is the base behavior for all `material-progress
+   * elements.
+   * @polymerBehavior Polymer.MaterialProgressBehavior
+   */
   Polymer.MaterialProgressBehavior = [{
     properties: {
       /**
@@ -60,7 +65,7 @@
       if (this._attached) {
         // Reading and computing fundamental data
         this._computeSumAndBars();
-        var barMeta, i = 0, hasOneValue = false, animationDelay = 600 / (this.bars.length - 1);
+        var i, index, bar, barMeta, foundOneValue = false, animationDelay = 600 / (this.bars.length - 1);
 
         // Legend initialization
         if (!this._legendItems) {
@@ -74,26 +79,27 @@
 
         // Computing each bar
         if (this.bars) {
-          this.bars.forEach(function(bar, index) {
+          for (i = this.bars.length - 1, index = this._barWithValueCount - 1; i >= 0; i--) { 
+            bar = this.bars[i];
             barMeta = this._getBarMeta(bar);
             // Sizing/Styling
             this.toggleClass('visible', barMeta.value > 0, bar);
-            this.toggleClass('last', index === this.bars.length - 1, bar);
+            this.toggleClass('last', barMeta.value > 0 && !foundOneValue, bar);
             bar.style.width = this.bars.length > 0 ? this._getWidthForBar(barMeta.value, this.sum, this._maxBarValue, this.barHeight) : '0px';
-            bar.style.zIndex = this.bars.length + 1 - index;
+            bar.style.zIndex = this.bars.length - i;
             if (barMeta.value > 0) {
-              hasOneValue = true;
+              foundOneValue = true;
               // Entry animation
               if (!this._initialized) {
-                this._playFirstAnimation(bar, barMeta.value, i, animationDelay);
+                this._playFirstAnimation(bar, index, animationDelay);
               }
               // Legend
               if (barMeta.legend) {
                 this.push('_legendItems', {label: barMeta.legend, color: window.getComputedStyle(bar).backgroundColor});
               }
-              i++;
+              index--;
             }
-          }, this);
+          }
         }
         // Update Polymer's custom styles
         if (!this._oldBarHeight || this._oldBarHeight !== this.barHeight) {
@@ -101,7 +107,7 @@
           this.updateStyles();
           this._oldBarHeight = this.barHeight;
         }
-        this._initialized = hasOneValue;
+        this._initialized = foundOneValue;
       }
     },
     ready: function() {
@@ -122,7 +128,7 @@
       this.debounce('refresh', this.refresh, 10);
     },
     _computeSumAndBars: function() {
-      var sum = 0, value = 0, max = 0, validBars = [],
+      var sum = 0, value = 0, withValueCount = 0, max = 0, validBars = [],
       allChildren = (Polymer.dom(this.$.content).getDistributedNodes());
       if (allChildren) {
         allChildren.forEach(function(child) {
@@ -130,6 +136,7 @@
             validBars.push(child);
             value = this._getBarMeta(child).value;
             sum += value;
+            withValueCount += value > 0 ? 1 : 0;
             max = Math.max(max, value);
           }
         }, this);
@@ -137,6 +144,7 @@
       this._setBars(validBars);
       this._setSum(sum);
       this._maxBarValue = max;
+      this._barWithValueCount = withValueCount;
       return sum;
     },
     _getBarMeta: function(bar) {

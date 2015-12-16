@@ -46,13 +46,13 @@ The following custom properties and mixins are available for styling:
 
 Custom property | Description | Default
 ----------------|-------------|----------
-`--material-progress-bar-background-color` | Background color of the whole progress bar. | `#E0E0E0`
+`--material-progress-bars-background-color` | Background color of the whole progress bar. | `#E0E0E0`
 `--material-progress-bars-style` | Mixin applied to the progress bar container. | `{}`
 `--material-progress-legend-style` | Mixin applied to the legend's container. | `{}`
 `--material-progress-legend-item-style` | Mixin applied to each legend item. | `{}`
 
 @group material-progress
-@element material-progress-bar
+@element material-progress-bars
 @demo demo/index.html
 -->
 <dom-module id="material-progress-bars">
@@ -61,7 +61,7 @@ Custom property | Description | Default
     <style>
       #barsContainer {
         overflow: hidden;
-        background-color: var(--material-progress-bar-background-color, #E0E0E0);
+        background-color: var(--material-progress-bars-background-color, #E0E0E0);
         border-radius: calc(var(--material-progress-bar-height) / 2);
         min-width: var(--material-progress-bar-height);
         height: var(--material-progress-bar-height);

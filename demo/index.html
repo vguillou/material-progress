@@ -30,12 +30,20 @@
     hr {
       margin-top: 32px;
     }
-    h3, p {
-      margin: 16px;
+    h3, .title-container {
+      margin: 32px 16px 16px 16px;
+    }
+    .title-container {
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+    }
+    .title-container > * {
+      margin-right: 32px
     }
     material-progress-bars,
     material-progress-histo {
       margin: 16px;
+      max-width: 900px;
       @apply(--paper-font-body2);
     }
     material-progress-bars > .bar > span {
@@ -105,23 +113,27 @@
     <h3>Interactive demo</h3>
 
     <div class="demo-inputs">
-      <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
       <span>bar height: <input id="iheight" type="number" value="22" onchange="inputChange()"></span>
-      <span>bars count: [[mpb2bars.length]] - [[mph2bars.length]]</span>
+      <span>legend label: <input id="ilegend" value="Legend:" onchange="inputChange()"></span>
       <span>
         <button on-tap="addBar">+ Add bar</button>
         <button on-tap="removeBar">- Remove bar</button>
       </span>
     </div>
     <div class="demo-inputs">
-      <span>bar1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
-      <span>bar2: <input id="ibar2" type="number" value="9"  onchange="inputChange()"></span>
-      <span>bar3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
-      <span>bar4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
+      <span>bar 1: <input id="ibar1" type="number" value="14" onchange="inputChange()"></span>
+      <span>bar 2: <input id="ibar2" type="number" value="9"  onchange="inputChange()"></span>
+      <span>bar 3: <input id="ibar3" type="number" value="50" onchange="inputChange()"></span>
+      <span>bar 4: <input id="ibar4" type="number" value="20" onchange="inputChange()"></span>
     </div>
 
-    <p>material-progress-bars</p>
-    <material-progress-bars id="mpb2" max="[[max]]" bar-height="[[barHeight]]" bars="{{mpb2bars}}" animated legend-label="Legend:">
+    <div class="title-container">
+      <p>material-progress-bars</p>
+      <span>bars count: [[mpb2Bars.length]]</span>
+      <span>sum: [[mpb2Sum]]</span>
+      <span>max: <input id="imax" type="number" value="100" onchange="inputChange()"></span>
+    </div>
+    <material-progress-bars id="mpb2" max="[[max]]" bar-height="[[barHeight]]" bars="{{mpb2Bars}}" sum="{{mpb2Sum}}" animated legend-label="{{legendLabel}}">
       <div class="bar" data-value$="[[bar1Value]]" data-legend="bar 1">
         <iron-icon icon="maps:directions-walk"></iron-icon>
         <span>bar 1</span>
@@ -144,8 +156,13 @@
       </template>
     </material-progress-bars>
 
-    <p>material-progress-histo</p>
-    <material-progress-histo id="mph2" bar-height="[[barHeight]]" bars="{{mph2Bars}}" animated legend-label="Legend:">
+    <div class="title-container">
+      <p>material-progress-histo</p>
+      <span>bars count: [[mph2Bars.length]]</span>
+      <span>sum: [[mph2Sum]]</span>
+      <span><input id="iscaletosum" type="checkbox" onchange="inputChange()"> scale-to-sum</span>
+    </div>
+    <material-progress-histo id="mph2" scale-to-sum$="[[scaleToSum]]" bar-height="[[barHeight]]" bars="{{mph2Bars}}" sum="{{mph2Sum}}" animated legend-label="{{legendLabel}}">
       <div class="bar" data-value$="[[bar1Value]]" data-legend="bar 1">
         <iron-icon icon="maps:directions-walk"></iron-icon>
         <span>bar 1</span>
@@ -181,7 +198,10 @@
     function inputChange() {
       demo.async(function() {
         demo.max = Number(demo.$.imax.value);
+        console.log(demo.$.iscaletosum.value, demo.$.iscaletosum.checked);
+        demo.scaleToSum = demo.$.iscaletosum.checked;
         demo.barHeight = Number(demo.$.iheight.value);
+        demo.legendLabel = demo.$.ilegend.value;
         demo.bar1Value = Number(demo.$.ibar1.value);
         demo.bar2Value = Number(demo.$.ibar2.value);
         demo.bar3Value = Number(demo.$.ibar3.value);
