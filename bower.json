@@ -1,10 +1,15 @@
 {
   "name": "material-progress",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "authors": [
     "Vincent Guillou <vin.guillou@gmail.com>"
   ],
-  "description": "A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer. WIP!",
+  "description": "A Material design multi-progress bar collection, inspired by Google Fit and made with Polymer.",
+  "main": [
+    "material-progress-bars.html",
+    "material-progress-histo.html",
+    "material-progress-behavior.html"
+  ],
   "keywords": [
     "progress bar",
     "progress",
