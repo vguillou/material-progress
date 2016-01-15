@@ -95,7 +95,7 @@
               }
               // Legend
               if (barMeta.legend) {
-                this.push('_legendItems', {label: barMeta.legend, color: window.getComputedStyle(bar).backgroundColor});
+                this.splice('_legendItems', 1, 0, {label: barMeta.legend, color: window.getComputedStyle(bar).backgroundColor});
               }
               index--;
             }
