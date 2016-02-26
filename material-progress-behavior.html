@@ -112,7 +112,8 @@
     },
     ready: function() {
       this._mutationObserver = new MutationObserver(this._observeChildrenMutations.bind(this));
-      this._mutationObserver.observe(this, {childList: true, attributes: true, subtree: true});
+      this._mutationObserver.observe(this, {childList: true, subtree: true, attributes: true,
+        attributeFilter: ['data-value', 'data-legend', 'data-legend-always-visible']});
     },
     attached: function() {
       this._attached = true;
