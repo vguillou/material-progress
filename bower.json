@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.9",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.3",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.5",
     "iron-icon": "PolymerElements/iron-icon#^1.0.7",
     "iron-icons": "PolymerElements/iron-icons#^1.0.4",
