@@ -86,7 +86,7 @@ Custom property | Description | Default
         <span>test</span>
       </content>
     </div>
-    <div class="legend" hidden$="[[_computeShowLegend(_legendItems)]]">
+    <div class="legend" hidden$="[[_legendNeeded]]">
       <template is="dom-repeat" items="[[_legendItems]]" as="l">
         <span style$="color: [[l.color]];">[[l.label]]</span>
       </template>

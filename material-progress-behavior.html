@@ -35,20 +35,17 @@
         observer: '_refresh'
       },
       /**
-       * Array of the displayed bar nodes (ie direct children with 
+       * The displayed bar nodes (ie direct children with 
        * the `bar` class and a `data-value` attribute).
-       * 
-       * @type {Array}
        */
       bars: {
         type: Array,
+        value: function() {return [];},
         notify: true,
         readOnly: true
       },
       /**
        * Sum of all the bars' values.
-       *
-       * @type {Number}
        */
       sum: {
         type: Number,
@@ -56,6 +53,26 @@
         notify: true,
         readOnly: true,
         reflectToAttribute: true
+      },
+      /**
+       * The legend items to be displayed: Each is composed of the following
+       * attributes :
+       * - `label`: match the `data-legend` attribute of the corresponding bar.
+       * - `color`: match the css `background-color` of the corresponding bar.
+       */
+      _legendItems: {
+        type: Array,
+        value: function() {return [];},
+        readOnly: true
+      },
+      /**
+       * Indicates if the legend needs to be displayed.
+       */
+      _legendNeeded: {
+        type: Boolean,
+        value: false,
+        compute: '_computeLegendNeeded(_legendItems)',
+        readOnly: true
       }
     },
     /**
@@ -68,11 +85,7 @@
         var i, index, bar, barMeta, foundOneValue = false, animationDelay = 600 / (this.bars.length - 1);
 
         // Legend initialization
-        if (!this._legendItems) {
-          this._legendItems = [];
-        } else {
-          this.splice('_legendItems', 0, this._legendItems.length);
-        }
+        this.splice('_legendItems', 0, this._legendItems.length);
         if (this.legendLabel) {
           this.push('_legendItems', {label: this.legendLabel});
         }
@@ -170,7 +183,7 @@
         }, 500 + animationDelay * index);
       }.bind(this))(node, index, animationDelay);
     },
-    _computeShowLegend: function(legendItems) {
+    _computeLegendNeeded: function(legendItems) {
       return legendItems && legendItems.length > 0;
     },
     _observeChildrenMutations: function(mutations) {
