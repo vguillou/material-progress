@@ -20,3 +20,8 @@ use this command
 Please refer to the <a href="https://vguillou.github.io/webcomponents/material-progress">component page</a> for more informations.
 
 Demos available <a href="https://vguillou.github.io/webcomponents/material-progress/demo">here</a>.
+
+
+## License
+
+[MIT License](https://github.com/vguillou/material-progress/blob/master/LICENSE.md)
