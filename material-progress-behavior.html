@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../mutation-observer-behavior/mutation-observer-behavior.html">
 
 <script>
 (function() {
@@ -8,7 +9,7 @@
    * elements.
    * @polymerBehavior Polymer.MaterialProgressBehavior
    */
-  Polymer.MaterialProgressBehavior = [{
+  Polymer.MaterialProgressBehaviorImpl = {
     properties: {
       /**
        * Height of the bar and bars, in pixels.
@@ -75,6 +76,11 @@
         readOnly: true
       }
     },
+
+    listeners: {
+      'dom-mutation': 'refresh'
+    },
+
     /**
      * Refresh the element.
      */
@@ -124,19 +130,19 @@
       }
     },
     ready: function() {
-      this._mutationObserver = new MutationObserver(this._observeChildrenMutations.bind(this));
-      this._mutationObserver.observe(this, {childList: true, subtree: true, attributes: true,
-        attributeFilter: ['data-value', 'data-legend', 'data-legend-always-visible']});
+      // Setting up the mutation observer
+      this._mutationOptions = {childList: true, subtree: true, attributes: true, characterData: false,
+        attributeFilter: ['data-value', 'data-legend', 'data-legend-always-visible']};
+      this._mutationFilter = function(mutation) {
+        // We only want to listen to mutations (addition, removal, attribute change)
+        // of the direct children of the bar's container
+        return this._mutationIsChildList(mutation, this.$.barsContainer) ||
+          this._mutationIsChildAttributes(mutation, this.$.barsContainer);
+      };
     },
     attached: function() {
       this._attached = true;
       this._refresh();
-    },
-    detached: function() {
-      if (this._mutationObserver) {
-        this._mutationObserver.disconnect();
-        this._mutationObserver = null;
-      }
     },
     _refresh: function() {
       this.debounce('refresh', this.refresh, 10);
@@ -185,19 +191,13 @@
     },
     _computeLegendNeeded: function(legendItems) {
       return legendItems && legendItems.length > 0;
-    },
-    _observeChildrenMutations: function(mutations) {
-      var t, relevantMut = false;
-      var needsUpdate = mutations.some(function (m) {
-        t = m.target;
-        relevantMut = m.type === 'attributes' && t && (t.parentElement === this || t.parentElement === this.$.barsContainer) && (m.attributeName === 'data-value' || m.attributeName === 'data-legend');
-        relevantMut = relevantMut || (m.type === 'childList' && (t === this || t === this.$.barsContainer));
-        return relevantMut;
-      }, this);
-      if (needsUpdate) {
-        this._refresh();
-      }
     }
-  }];
+  };
+
+  /** @polymerBehavior */
+  Polymer.MaterialProgressBehavior = [
+    Polymer.MaterialProgressBehaviorImpl,
+    Polymer.MutationObserverBehavior
+  ];
 })();
 </script>
