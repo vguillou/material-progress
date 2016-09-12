@@ -17,9 +17,9 @@ use this command
 
 ## Documentation and demo
 
-Please refer to the <a href="https://vguillou.github.io/webcomponents/material-progress">component page</a> for more informations.
+Please refer to the <a href="https://vguillou.github.io/webcomponents/material-progress-v0.1.3">component page</a> for more informations.
 
-Demos available <a href="https://vguillou.github.io/webcomponents/material-progress/demo">here</a>.
+Demos available <a href="https://vguillou.github.io/webcomponents/material-progress-v0.1.3/demo">here</a>.
 
 
 ## License
