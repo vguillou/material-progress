@@ -18,6 +18,7 @@
   <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../material-progress-bars.html">
   <link rel="import" href="../material-progress-histo.html">
+  <link rel="import" href="../material-progress-circle.html">
 
   <style is="custom-style" include="demo-pages-shared-styles">
     body {
@@ -120,6 +121,25 @@
             <span>World</span>
           </div>
         </material-progress-histo>
+
+      </template>
+    </demo-snippet>
+
+    <h3>&lt;material-progress-circle&gt;</h3>
+    <demo-snippet class="centered-demo">
+      <template>
+
+        <style is="custom-style">
+          material-progress-circle {
+            width: 100%;
+            @apply(--paper-font-body2);
+          }
+        </style>
+
+        <material-progress-circle id="mpc1" animated>
+          <p>line 1</p>
+          <p>line 2</p>
+        </material-progress-circle>
 
       </template>
     </demo-snippet>
@@ -262,6 +282,15 @@
     demo.extraBars = [];
 
     demo.addEventListener('dom-change', function() {
+      this.async(function() {
+        document.querySelector('#mpc1').data = [
+          {value: 21, icon: null, color:'#ff5722'},
+          {value: 13, icon: null, color:'#9c27b0'},
+          {value: 50, icon: null, color:'#00bcd4'},
+          {value: 30, icon: null, color:'#ff9800'}
+        ];
+      }, 500);
+
       inputChange();
     });
 

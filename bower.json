@@ -39,12 +39,13 @@
   "homepage": "https://vguillou.github.io/webcomponents/material-progress",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.0.0",
-    "mutation-observer-behavior": "vguillou/mutation-observer-behavior#^1.0.0"
+    "mutation-observer-behavior": "vguillou/mutation-observer-behavior#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-icon": "PolymerElements/iron-icon#^1.0.0",
     "iron-icons": "PolymerElements/iron-icons#^1.0.0",
     "paper-styles": "PolymerElements/paper-styles#^1.0.0"
