@@ -8,7 +8,7 @@ A Material design circle-multi-progress bar, inspired by Google Fit.
 TODO docs
 
 @group material-progress
-@element material-progress-bars
+@element material-progress-circle
 @demo demo/index.html
 -->
 <dom-module id="material-progress-circle">
@@ -57,7 +57,7 @@ TODO docs
           cx$="[[_cx]]"
           cy$="[[_cy]]"
           fill="transparent"
-          stroke-width$="[[barHeight]]" />
+          stroke-width$="[[barThickness]]" />
     </svg>
     <div id="contentContainer">
       <content></content>
@@ -110,9 +110,9 @@ TODO docs
       },
 
       /**
-       * Height (or thickness) of every progress bar.
+       * Thickness of every progress bar.
        */
-      barHeight: {
+      barThickness: {
         type: Number,
         value: 12,
         observer: '_requestRender'
@@ -150,7 +150,7 @@ TODO docs
       this._setSum(this._computeSum(barsData));
       this._cx = this.clientWidth / 2;
       this._cy = this.clientHeight / 2;
-      this._radius = Math.max(0, Math.min(this._cx, this._cy) - this.barHeight / 2);
+      this._radius = Math.max(0, Math.min(this._cx, this._cy) - this.barThickness / 2);
       this._dasharray = 2 * Math.PI * this._radius;
       
       // Compute each bar's data
@@ -243,7 +243,7 @@ TODO docs
         bar.setAttribute('stroke', color || '#FF5722');
       }
       bar.setAttribute('fill', 'transparent');
-      bar.setAttribute('stroke-width', this.barHeight);
+      bar.setAttribute('stroke-width', this.barThickness);
       bar.setAttribute('stroke-dasharray', this._dasharray);
       bar.setAttribute('stroke-dashoffset', dashoffsetExists ? dashoffset : this._dasharray);
       bar.setAttribute('transform', this._computeTransform(this._cx, this._cy));
@@ -254,7 +254,7 @@ TODO docs
      * Update the container of all content at the center of the circle bars
      */
     _updateContentContainer: function() {
-      var innerRadius = this._radius - this.barHeight / 2;
+      var innerRadius = this._radius - this.barThickness / 2;
       var contentContainerStyle = this.$.contentContainer.style;
       contentContainerStyle.left = (this._cx - innerRadius) + 'px';
       contentContainerStyle.top = (this._cy - innerRadius) + 'px';
