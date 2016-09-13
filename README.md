@@ -25,3 +25,18 @@ Demos available <a href="https://vguillou.github.io/webcomponents/material-progr
 ## License
 
 [MIT License](https://github.com/vguillou/material-progress/blob/master/LICENSE.md)
+
+
+## Changelog
+
+The update to v1.0.0 will bring a gazillion breaking changes.
+- Complete rewrite, with SVG based progress bars
+- Much better performance
+- Breaking: `material-progress-bars` renamed to `material-progress-stacked-bars`
+- Breaking: `material-progress-histo` renamed to `material-progress-bars`
+- Breaking: Using a new `data` property instead of defining the bars yourself programmatically
+- Breaking: Properties renaming :
+    - `barHeight` => `barThickness`
+    - Custom style properties renaming to match the new element names
+- Breaking: The legend has it's own configurable component: `material-progress-legend`
+- Brand new `material-progress-circle` to complete the set
