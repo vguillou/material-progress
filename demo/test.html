@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>material-progress-circle test demo</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="msapplication-TileColor" content="#ff5722">
+  <meta name="theme-color" content="#ff5722">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
+  <link rel="import" href="../../paper-styles/color.html">
+  <link rel="import" href="../material-progress-circle.html">
+
+  <style is="custom-style">
+    material-progress-circle {
+    }
+    #mpc1 {
+    }
+    #mpc3, #mpc4 {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+    }
+    .testContainer {
+      width: 300px;
+    }
+    .test {
+      display: inline-block;
+      position: relative;
+      width: 100%;
+      padding-bottom: 100%;
+      vertical-align: middle;
+    }
+    svg {
+      display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    }
+
+    .containerHF {
+      @apply(--layout-horizontal);
+      @apply(--layout-flex);
+    }
+    .containerHF .test,
+    .containerHF material-progress-circle {
+      width: 100%;
+    }
+
+    circle {
+      stroke: red;
+      fill: transparent;
+    }
+  </style>
+</head>
+
+<body unresolved>
+
+  <h3>&lt;material-progress-circle&gt; 1</h3>
+  <material-progress-circle id="mpc1" animated>
+    <p>line 1</p>
+    <p>mpc1</p>
+  </material-progress-circle>
+
+  <h3>&lt;test&gt; 1</h3>
+  <div class="test">
+    <svg version="1.1" viewBox="0 0 1000 1000" preserveAspectRatio="xMinYMin meet">
+      <circle cx="500" cy="500" r="500" stroke-width="5" />
+    </svg>
+  </div>
+
+  <h3>&lt;material-progress-circle&gt; 2</h3>
+  <material-progress-circle id="mpc3" animated>
+    <p>line 1</p>
+    <p>mpc3</p>
+  </material-progress-circle>
+  <material-progress-circle id="mpc4">
+    <p>line 1</p>
+    <p>mpc4</p>
+  </material-progress-circle>
+
+  <div class="containerHF">
+    <material-progress-circle>
+      <p>line 1</p>
+      <p>mpc5</p>
+    </material-progress-circle>
+    <material-progress-circle animated>
+      <p>line 1</p>
+      <p>mpc6</p>
+    </material-progress-circle>
+  </div>
+
+  <div class="testContainer">
+    <div class="test">
+      <svg version="1.1" viewBox="0 0 1000 1000" preserveAspectRatio="xMinYMin meet">
+        <circle cx="500" cy="500" r="500" stroke-width="5" />
+      </svg>
+    </div>
+  </div>
+
+  <div class="containerHF">
+    <div class="test">
+      <svg version="1.1" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin meet">
+        <circle cx="50" cy="50" r="50" />
+      </svg>
+    </div>
+    <div class="test">
+      <svg version="1.1" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin meet">
+        <circle cx="50" cy="50" r="50" />
+      </svg>
+    </div>
+  </div>
+
+  
+  <script>
+    setTimeout(function() {
+      /*document.querySelector('#mpc1').data = [
+        {value: 21, icon: null, color:'#ff5722'},
+        {value: 13, icon: null, color:'#9c27b0'},
+        {value: 50, icon: null, color:'#00bcd4'},
+        {value: 30, icon: null, color:'#ff9800'}
+      ];*/
+      document.querySelectorAll('material-progress-circle').forEach(function(mpc) {
+        mpc.data = [
+          {value: 11, icon: null, color:'#ff5722'},
+          {value: 7, icon: null, color:'#9c27b0'},
+          {value: 26, icon: null, color:'#00bcd4'},
+          {value: 17, icon: null, color:'#ff9800'}
+        ];
+      });
+    }, 2000);
+  </script>
+
+</body>
+</html>

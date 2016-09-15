@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<
 
 <!--
 A Material design circle-multi-progress bar, inspired by Google Fit.
@@ -16,51 +17,59 @@ TODO docs
     :host {
       position: relative;
       display: block;
-      margin: 8px;
       width: 200px;
-      height: 200px;
       opacity: 0;
-      transition: opacity 500ms cubic-bezier(0.4, 0.0, 0.2, 1);
-      background: var(--material-progress-background-color, transparent);
+      transition: opacity 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+      padding: 8px;
     }
     :host(.ready) {
       opacity: 1;
     }
+    #container {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      padding-bottom: 100%;
+      vertical-align: middle;
+    }
     svg {
       position: absolute;
-      display: block;
+      display: inline-block;
       left: 0; 
-      right: 0; 
-      height: 100% !important;
-      width: 100% !important;
+      right: 0;
     }
-    svg circle.backgroundSvg {
+    svg circle.backgroundCircle {
       stroke: var(--material-progress-bars-background-color, rgba(0, 0, 0, 0.04));
     }
-    svg circle.barSvg {
+    svg circle.bar {
       stroke-linecap: var(--material-progress-bar-linecap, round);
     }
-    :host([animated]) svg circle.barSvg {
-      transition: stroke-dashoffset 850ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    #container.animated svg circle.bar {
+      transition: stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
     }
     #contentContainer {
       position: absolute;
+      left: 0; 
+      right: 0; 
       border-radius: 50%;
+      background: var(--material-progress-background-color, transparent);
       @apply(--layout-vertical);
       @apply(--layout-center-center);
     }
   </style>
   <template>
-    <svg id="svg">
-      <circle class="backgroundSvg"
-          r$="[[_radius]]"
-          cx$="[[_cx]]"
-          cy$="[[_cy]]"
-          fill="transparent"
-          stroke-width$="[[barThickness]]" />
-    </svg>
-    <div id="contentContainer">
-      <content></content>
+    <div id="container" class$="[[_computeContainerClass(animated, _resizing)]]">
+      <svg id="svg" version="1.1" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
+        <circle class="backgroundCircle"
+            r$="[[_radius]]"
+            cx$="[[_cx]]"
+            cy$="[[_cy]]"
+            fill="transparent"
+            stroke-width$="[[barThickness]]" />
+      </svg>
+      <div id="contentContainer">
+        <content></content>
+      </div>
     </div>
   </template>
 </dom-module>
@@ -94,7 +103,7 @@ TODO docs
        */
       max: {
         type: Number,
-        value: 128,
+        value: 100,
         observer: '_requestRender'
       },
 
@@ -137,20 +146,23 @@ TODO docs
     ],
 
     listeners: {
-      'iron-resize': '_requestRender'
+      'iron-resize': '_onResize'
     },
 
     /**
      * Render the whole component
      */
     render: function() {
+      Polymer.dom.flush();
+
       var _self = this;
       var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
       var svg = Polymer.dom(this.$.svg);
+      var container = this.$.container;
       this._setSum(this._computeSum(barsData));
-      this._cx = this.clientWidth / 2;
-      this._cy = this.clientHeight / 2;
-      this._radius = Math.max(0, Math.min(this._cx, this._cy) - this.barThickness / 2);
+      this._cx = container.clientWidth / 2;
+      this._cy = container.clientHeight / 2;
+      this._radius = Math.max(0, Math.min(this._cx || this._cy, this._cy || this._cx) - this.barThickness / 2);
       this._dasharray = 2 * Math.PI * this._radius;
       
       // Compute each bar's data
@@ -178,8 +190,26 @@ TODO docs
       // Set up the size of the inner content
       this._updateContentContainer();
 
+      // Switch off the resizing flag
+      this.async(function() {this._resizing = false;}, 500);
+
       // Display the element when ready
       this.classList.add('ready');
+    },
+
+    /**
+     * Request a render when ready
+     */
+    _requestRender: function() {
+      if (typeof this.$.container.clientWidth !== 'undefined')
+        this.debounce('render', this.render, 100);
+      else
+        this.async(this._requestRender, 100);
+    },
+
+    _onResize: function() {
+      this._resizing = true;
+      this._requestRender();
     },
 
     /**
@@ -204,22 +234,17 @@ TODO docs
     },
 
     /**
-     * Request a render when ready
+     * Compute the real sum off all the 'data.value'
      */
-    _requestRender: function() {
-      if (typeof this.clientWidth !== 'undefined') {
-        this.debounce('render', this.render, 50);
-      }
-      else {
-        this.async(this._requestRender, 50);
-      }
+    _computeContainerClass: function(animated, resizing) {
+      return animated && !resizing ? 'animated' : '';
     },
 
     /**
      * Transform attribute for every SVG circle
      */
-    _computeTransform: function(_cx, _cy) {
-      return 'rotate(-90, ' + _cx + ', ' + _cy + ')';
+    _computeTransform: function(cx, cy) {
+      return 'rotate(-90, ' + cx + ', ' + cy + ')';
     },
 
     /**
@@ -247,7 +272,7 @@ TODO docs
       bar.setAttribute('stroke-dasharray', this._dasharray);
       bar.setAttribute('stroke-dashoffset', dashoffsetExists ? dashoffset : this._dasharray);
       bar.setAttribute('transform', this._computeTransform(this._cx, this._cy));
-      bar.classList.add('barSvg');
+      bar.classList.add('bar');
     },
 
     /**
