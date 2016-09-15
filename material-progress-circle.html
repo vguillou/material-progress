@@ -38,14 +38,20 @@ TODO docs
       left: 0; 
       right: 0;
     }
-    svg circle.backgroundCircle {
+    circle.backgroundCircle {
       stroke: var(--material-progress-bars-background-color, rgba(0, 0, 0, 0.04));
     }
-    svg circle.bar {
+    :host([animated]) circle.backgroundCircle {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    circle.bar {
       stroke-linecap: var(--material-progress-bar-linecap, round);
     }
-    #container.animated svg circle.bar {
-      transition: stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    :host([animated]) circle.bar {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    :host([animated]) #container:not(.resizing) circle.bar {
+      transition: stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1), transform 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
     }
     #contentContainer {
       position: absolute;
@@ -58,7 +64,7 @@ TODO docs
     }
   </style>
   <template>
-    <div id="container" class$="[[_computeContainerClass(animated, _resizing)]]">
+    <div id="container">
       <svg id="svg" version="1.1" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
         <circle class="backgroundCircle"
             r$="[[_radius]]"
@@ -124,7 +130,7 @@ TODO docs
       barThickness: {
         type: Number,
         value: 12,
-        observer: '_requestRender'
+        observer: '_onResize'
       },
 
       /**
@@ -153,8 +159,6 @@ TODO docs
      * Render the whole component
      */
     render: function() {
-      Polymer.dom.flush();
-
       var _self = this;
       var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
       var svg = Polymer.dom(this.$.svg);
@@ -168,10 +172,11 @@ TODO docs
       // Compute each bar's data
       var normalizedMax = Math.max(this.max, this.sum);
       barsData.reduceRight(function(currentSum, bar) {
-        bar._sumValue = bar.value + currentSum;
-        bar._dashoffset = (1 - bar._sumValue / normalizedMax) * _self._dasharray;
-        return bar._sumValue;
+        bar._angleOffset = (currentSum / normalizedMax) * 360;
+        bar._dashOffset = (1 - bar.value / normalizedMax) * _self._dasharray;
+        return bar.value + currentSum;
       }, 0);
+      // previous sum / max = x / 360 => x = (previous sum / max) * 360
 
       // Ensure that there is a svg 'circle' element for each bar, flush the Dom and re-render
       if (barsData.length - (svg.children.length - 1) > 0) {
@@ -181,17 +186,17 @@ TODO docs
 
       // Set the correct attributes to each bar
       var svgChildren = svg.children;
-      var currentBar;
-      for (var j = 0, barCount = svgChildren.length; j < barCount-1; j++) {
-        currentBar = barsData[j] || {};
-        this._updateBar(svgChildren[j+1], currentBar._dashoffset, currentBar.color);
+      for (var i = 0, barCount = svgChildren.length; i < barCount-1; i++) {
+        this._updateBar(svgChildren[i+1], barsData[i] || {});
       }
 
       // Set up the size of the inner content
       this._updateContentContainer();
 
       // Switch off the resizing flag
-      this.async(function() {this._resizing = false;}, 500);
+      this.async(function() {
+        this.$.container.classList.remove('resizing');
+      }, 100);
 
       // Display the element when ready
       this.classList.add('ready');
@@ -208,7 +213,7 @@ TODO docs
     },
 
     _onResize: function() {
-      this._resizing = true;
+      this.$.container.classList.add('resizing');
       this._requestRender();
     },
 
@@ -236,20 +241,6 @@ TODO docs
     /**
      * Compute the real sum off all the 'data.value'
      */
-    _computeContainerClass: function(animated, resizing) {
-      return animated && !resizing ? 'animated' : '';
-    },
-
-    /**
-     * Transform attribute for every SVG circle
-     */
-    _computeTransform: function(cx, cy) {
-      return 'rotate(-90, ' + cx + ', ' + cy + ')';
-    },
-
-    /**
-     * Compute the real sum off all the 'data.value'
-     */
     _computeSum: function(barsData) {
       return barsData.reduce(function(sum, bar) {
         return sum + (bar.value || 0);
@@ -259,19 +250,20 @@ TODO docs
     /**
      * Update all necessary attributes of a bar (SVG circle node)
      */
-    _updateBar: function(bar, dashoffset, color) {
-      var dashoffsetExists = dashoffset || dashoffset == 0;
+    _updateBar: function(bar, descriptor) {
+      var dashOffsetExists = descriptor._dashOffset || descriptor._dashOffset == 0;
       bar.setAttribute('r', this._radius);
       bar.setAttribute('cx', this._cx);
       bar.setAttribute('cy', this._cy);
-      if (dashoffsetExists) {
-        bar.setAttribute('stroke', color || '#FF5722');
+      if (dashOffsetExists) {
+        bar.setAttribute('stroke', descriptor.color || '#FF5722');
       }
       bar.setAttribute('fill', 'transparent');
       bar.setAttribute('stroke-width', this.barThickness);
       bar.setAttribute('stroke-dasharray', this._dasharray);
-      bar.setAttribute('stroke-dashoffset', dashoffsetExists ? dashoffset : this._dasharray);
-      bar.setAttribute('transform', this._computeTransform(this._cx, this._cy));
+      bar.setAttribute('stroke-dashoffset', dashOffsetExists ? descriptor._dashOffset : this._dasharray);
+      bar.style.transform = 'rotateZ(' + ((descriptor._angleOffset || 0) - 90) + 'deg)';
+      bar.style.transformOrigin = this._cx + 'px ' + this._cy + 'px'; 
       bar.classList.add('bar');
     },
 
