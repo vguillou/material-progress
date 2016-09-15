@@ -203,18 +203,18 @@ TODO docs
     },
 
     /**
-     * Request a render when ready
+     * Request an update when ready
      */
-    _requestRender: function() {
+    _requestUpdate: function() {
       if (typeof this.$.container.clientWidth !== 'undefined')
-        this.debounce('render', this.render, 100);
+        this.debounce('update', this.update, 100);
       else
-        this.async(this._requestRender, 100);
+        this.async(this._requestUpdate, 100);
     },
 
     _onResize: function() {
       this.$.container.classList.add('resizing');
-      this._requestRender();
+      this._requestUpdate();
     },
 
     /**
@@ -235,7 +235,7 @@ TODO docs
 
       // Flush DOM and re-render to allow the css transition
       Polymer.dom.flush();
-      this._requestRender();
+      this._requestUpdate();
     },
 
     /**
@@ -280,7 +280,7 @@ TODO docs
     },
 
     attached: function() {
-      this._requestRender();
+      this._requestUpdate();
     }
   });
 })();
