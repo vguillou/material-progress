@@ -110,7 +110,7 @@ TODO docs
       max: {
         type: Number,
         value: 100,
-        observer: '_requestRender'
+        observer: '_requestUpdate'
       },
 
       /**
@@ -148,7 +148,7 @@ TODO docs
     ],
 
    observers: [
-      '_requestRender(data.*)'
+      '_requestUpdate(data.*)'
     ],
 
     listeners: {
@@ -156,9 +156,9 @@ TODO docs
     },
 
     /**
-     * Render the whole component
+     * Update the whole component
      */
-    render: function() {
+    update: function() {
       var _self = this;
       var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
       var svg = Polymer.dom(this.$.svg);
