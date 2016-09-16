@@ -131,14 +131,22 @@
 
         <style is="custom-style">
           material-progress-circle {
-            width: 300px;
-            @apply(--paper-font-body2);
+            width: 200px;
+            min-width: 140px;
+            font: 16px 'Roboto', sans-serif;
+          }
+          .inner-value {
+            font-size: 32px;
+            line-height: 33px;
+          }
+          .inner-unit {
+            color: #757575;
           }
         </style>
 
         <material-progress-circle id="mpc1" animated max="128">
-          <p>line 1</p>
-          <p>line 2</p>
+          <span class="inner-value">110</span>
+          <span class="inner-unit">steps</span>
         </material-progress-circle>
 
       </template>
@@ -287,7 +295,7 @@
           {value: 21, icon: null, color:'#ff5722'},
           {value: 13, icon: null, color:'#9c27b0'},
           {value: 50, icon: null, color:'#00bcd4'},
-          {value: 30, icon: null, color:'#ff9800'}
+          {value: 11, icon: null, color:'#ff9800'}
         ];
       }, 500);
 

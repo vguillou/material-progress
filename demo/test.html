@@ -65,13 +65,6 @@
     <p>mpc1</p>
   </material-progress-circle>
 
-  <h3>&lt;test&gt; 1</h3>
-  <div class="test">
-    <svg version="1.1" viewBox="0 0 1000 1000" preserveAspectRatio="xMinYMin meet">
-      <circle cx="500" cy="500" r="500" stroke-width="5" />
-    </svg>
-  </div>
-
   <h3>&lt;material-progress-circle&gt; 2</h3>
   <material-progress-circle id="mpc3" animated>
     <p>line 1</p>
@@ -123,7 +116,10 @@
         {value: 50, icon: null, color:'#00bcd4'},
         {value: 30, icon: null, color:'#ff9800'}
       ];*/
-      document.querySelectorAll('material-progress-circle').forEach(function(mpc) {
+      Array.prototype.slice.call(
+        document.querySelectorAll('material-progress-circle')
+        ,0)
+      .forEach(function(mpc) {
         mpc.data = [
           {value: 5, icon: null, color:'#ff5722'},
           {value: 5, icon: null, color:'#9c27b0'},

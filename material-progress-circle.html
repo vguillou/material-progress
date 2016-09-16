@@ -8,6 +8,18 @@ A Material design circle-multi-progress bar, inspired by Google Fit.
 
 TODO docs
 
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--material-progress-bar-linecap` | Linecap of the bar(s). | `round`
+`--material-progress-bars-background-color` | Background color behind the bar(s). | `rgba(0, 0, 0, 0.04)`
+`--material-progress-background-color` | Background style of the content inside the cirle bar(s). | `transparent`
+`--material-progress-content-style` | Mixin applied to the content inside the cirle bar(s). | `{}`
+
+
 @group material-progress
 @element material-progress-circle
 @demo demo/index.html
@@ -18,9 +30,10 @@ TODO docs
       position: relative;
       display: block;
       width: 200px;
+      box-sizing: border-box;
+      padding: 8px;
       opacity: 0;
       transition: opacity 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
-      padding: 8px;
     }
     :host(.ready) {
       opacity: 1;
@@ -55,12 +68,11 @@ TODO docs
     }
     #contentContainer {
       position: absolute;
-      left: 0; 
-      right: 0; 
       border-radius: 50%;
       background: var(--material-progress-background-color, transparent);
       @apply(--layout-vertical);
       @apply(--layout-center-center);
+      @apply(--material-progress-content-style);
     }
   </style>
   <template>
@@ -166,7 +178,8 @@ TODO docs
       this._setSum(this._computeSum(barsData));
       this._cx = container.clientWidth / 2;
       this._cy = container.clientHeight / 2;
-      this._radius = Math.max(0, Math.min(this._cx || this._cy, this._cy || this._cx) - this.barThickness / 2);
+      var halfSize = Math.min(this._cx || this._cy, this._cy || this._cx);
+      this._radius = Math.max(0, halfSize - this.barThickness / 2);
       this._dasharray = 2 * Math.PI * this._radius;
       
       // Compute each bar's data
@@ -191,7 +204,7 @@ TODO docs
       }
 
       // Set up the size of the inner content
-      this._updateContentContainer();
+      this._updateContentContainer(halfSize * 2);
 
       // Switch off the resizing flag
       this.async(function() {
@@ -270,13 +283,13 @@ TODO docs
     /**
      * Update the container of all content at the center of the circle bars
      */
-    _updateContentContainer: function() {
-      var innerRadius = this._radius - this.barThickness / 2;
-      var contentContainerStyle = this.$.contentContainer.style;
-      contentContainerStyle.left = (this._cx - innerRadius) + 'px';
-      contentContainerStyle.top = (this._cy - innerRadius) + 'px';
-      contentContainerStyle.width = (innerRadius * 2) + 'px';
-      contentContainerStyle.height = (innerRadius * 2) + 'px';
+    _updateContentContainer: function(outerSize) {
+      var style = this.$.contentContainer.style;
+      style.top = this.barThickness + 'px';
+      style.left = this.barThickness + 'px';
+      // Using width and height instead of right and bottom in order to be responsive only when re-rendering
+      style.width = (outerSize - 2 * this.barThickness) + 'px';
+      style.height = (outerSize - 2 * this.barThickness) + 'px';
     },
 
     attached: function() {
