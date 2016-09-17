@@ -77,7 +77,7 @@ Custom property | Description | Default
   </style>
   <template>
     <div id="container">
-      <svg id="svg" version="1.1" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
+      <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
         <circle class="backgroundCircle"
             r$="[[_radius]]"
             cx$="[[_cx]]"
@@ -147,6 +147,7 @@ Custom property | Description | Default
 
       /**
        * Animate when the size of a bar changes.
+       * Has no effect on Internet Explorer or Microsoft Edge as of 2016/09.
        */
       animated: {
         type: Boolean,
@@ -275,9 +276,18 @@ Custom property | Description | Default
       bar.setAttribute('stroke-width', this.barThickness);
       bar.setAttribute('stroke-dasharray', this._dasharray);
       bar.setAttribute('stroke-dashoffset', dashOffsetExists ? descriptor._dashOffset : this._dasharray);
-      bar.style.transform = 'rotateZ(' + ((descriptor._angleOffset || 0) - 90) + 'deg)';
-      bar.style.transformOrigin = this._cx + 'px ' + this._cy + 'px'; 
-      bar.classList.add('bar');
+      // IE and Edge can't handle CSS transform to SVG (and thus no animation)... Thanks MS!
+      if (document.documentMode || /Edge\/\d./i.test(navigator.userAgent)) {
+        bar.setAttribute('transform', 'rotate(' + ((descriptor._angleOffset || 0) - 90) + ' ' + this._cx + ' ' + this._cy + ')');
+      } else {
+        bar.style.transform = 'rotateZ(' + ((descriptor._angleOffset || 0) - 90) + 'deg)';
+        bar.style.transformOrigin = this._cx + 'px ' + this._cy + 'px';
+      }
+      // Working with attribute for the classname. Thanks IE!
+      var classes = bar.getAttribute('class') || '';
+      if (!classes || classes.indexOf(' bar') < 0) {
+        bar.setAttribute('class', classes + ' bar');
+      }
     },
 
     /**
