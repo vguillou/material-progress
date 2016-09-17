@@ -187,7 +187,8 @@ Custom property | Description | Default
       var normalizedMax = Math.max(this.max, this.sum);
       barsData.reduceRight(function(currentSum, bar) {
         bar._angleOffset = (currentSum / normalizedMax) * 360;
-        bar._dashOffset = (1 - bar.value / normalizedMax) * _self._dasharray;
+        bar._dashOffset = (1 - bar.value / normalizedMax) * _self._dasharray
+          + (currentSum == 0 ? _self.barThickness / 6.5 : 0); // Fix first bar length
         return bar.value + currentSum;
       }, 0);
       // previous sum / max = x / 360 => x = (previous sum / max) * 360
