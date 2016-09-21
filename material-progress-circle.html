@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="material-progress-behavior.html">
 <
 
 <!--
@@ -157,16 +157,12 @@ Custom property | Description | Default
     },
 
     behaviors: [
-      Polymer.IronResizableBehavior
+      Polymer.MaterialProgressBehavior
     ],
 
-   observers: [
+    observers: [
       '_requestUpdate(data.*)'
     ],
-
-    listeners: {
-      'iron-resize': '_onResize'
-    },
 
     /**
      * Update the whole component
@@ -175,10 +171,9 @@ Custom property | Description | Default
       var _self = this;
       var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
       var svg = Polymer.dom(this.$.svg);
-      var container = this.$.container;
       this._setSum(this._computeSum(barsData));
-      this._cx = container.clientWidth / 2;
-      this._cy = container.clientHeight / 2;
+      this._cx = this._clientWidth / 2;
+      this._cy = this._clientHeight / 2;
       var halfSize = Math.min(this._cx || this._cy, this._cy || this._cx);
       this._radius = Math.max(0, halfSize - this.barThickness / 2);
       this._dasharray = 2 * Math.PI * this._radius;
@@ -208,28 +203,16 @@ Custom property | Description | Default
       // Set up the size of the inner content
       this._updateContentContainer(halfSize * 2);
 
-      // Switch off the resizing flag
-      this.async(function() {
-        this.$.container.classList.remove('resizing');
-      }, 100);
-
       // Display the element when ready
       this.classList.add('ready');
     },
 
     /**
-     * Request an update when ready
+     * Pseudo getter for the inner container of all the SVGs.
+     * Needed by `Polymer.MaterialProgressBehavior`
      */
-    _requestUpdate: function() {
-      if (typeof this.$.container.clientWidth !== 'undefined')
-        this.debounce('update', this.update, 100);
-      else
-        this.async(this._requestUpdate, 100);
-    },
-
-    _onResize: function() {
-      this.$.container.classList.add('resizing');
-      this._requestUpdate();
+    _getContainer: function() {
+      return this.$.container;
     },
 
     /**
@@ -301,10 +284,6 @@ Custom property | Description | Default
       // Using width and height instead of right and bottom in order to be responsive only when re-rendering
       style.width = (outerSize - 2 * this.barThickness) + 'px';
       style.height = (outerSize - 2 * this.barThickness) + 'px';
-    },
-
-    attached: function() {
-      this._requestUpdate();
     }
   });
 })();

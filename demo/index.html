@@ -16,7 +16,7 @@
   <link rel="import" href="../../iron-icons/maps-icons.html">
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../../paper-styles/typography.html">
-  <link rel="import" href="../material-progress-bars.html">
+  <link rel="import" href="../material-progress-bars1.html">
   <link rel="import" href="../material-progress-circle.html">
   <link rel="import" href="../material-progress-stacked-bars.html">
 
@@ -83,12 +83,12 @@
       </template>
     </demo-snippet>
 
-    <h3>&lt;material-progress-bars&gt;</h3>
+    <h3>&lt;material-progress-bars1&gt;</h3>
     <demo-snippet class="centered-demo">
       <template>
 
         <style is="custom-style">
-          material-progress-bars {
+          material-progress-bars1 {
             width: 100%;
             @apply(--paper-font-body2);
           }
@@ -106,7 +106,7 @@
           }
         </style>
 
-        <material-progress-bars bar-height="22" animated>
+        <material-progress-bars1 bar-height="22" animated>
           <div class="bar" data-value="21">
             <iron-icon icon="maps:directions-walk"></iron-icon>
           </div>
@@ -120,7 +120,7 @@
           <div class="bar world" data-value="30">
             <span>World</span>
           </div>
-        </material-progress-bars>
+        </material-progress-bars1>
 
       </template>
     </demo-snippet>
@@ -157,7 +157,7 @@
       <style is="custom-style">
         /* material-progress elements */
         material-progress-stacked-bars,
-        material-progress-bars {
+        material-progress-bars1 {
           width: 100%;
           @apply(--paper-font-body2);
         }
@@ -250,14 +250,14 @@
       </demo-snippet>
 
       <div class="inputs-container demo-title-container">
-        <h3>&lt;material-progress-bars&gt;</h3>
+        <h3>&lt;material-progress-bars1&gt;</h3>
         <div>bars count: [[mph2Bars.length]]</div>
         <div>sum: [[mph2Sum]]</div>
         <div><input id="iscaletosum" type="checkbox" onchange="inputChange()"> scale-to-sum</div>
       </div>
 
       <demo-snippet class="centered-demo">
-        <material-progress-bars id="mph2" scale-to-sum$="[[scaleToSum]]" bar-height="[[barHeight]]" bars="{{mph2Bars}}" sum="{{mph2Sum}}" animated legend-label="{{legendLabel}}">
+        <material-progress-bars1 id="mph2" scale-to-sum$="[[scaleToSum]]" bar-height="[[barHeight]]" bars="{{mph2Bars}}" sum="{{mph2Sum}}" animated legend-label="{{legendLabel}}">
           <div class="bar" data-value$="[[bar1Value]]" data-legend="bar 1">
             <iron-icon icon="maps:directions-walk"></iron-icon>
             <span>bar 1</span>
@@ -278,7 +278,7 @@
               <span>[[item]]</span>
             </div>
           </template>
-        </material-progress-bars>
+        </material-progress-bars1>
       </demo-snippet>
 
     </template>
