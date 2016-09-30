@@ -32,11 +32,6 @@ Custom property | Description | Default
       width: 200px;
       box-sizing: border-box;
       padding: 8px;
-      opacity: 0;
-      transition: opacity 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
-    }
-    :host(.ready) {
-      opacity: 1;
     }
     #container {
       position: relative;
@@ -44,6 +39,11 @@ Custom property | Description | Default
       width: 100%;
       padding-bottom: 100%;
       vertical-align: middle;
+      opacity: 0;
+      transition: opacity 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    #container.ready {
+      opacity: 1;
     }
     svg {
       position: absolute;
@@ -51,19 +51,19 @@ Custom property | Description | Default
       left: 0; 
       right: 0;
     }
-    circle.backgroundCircle {
+    .barsBackground {
       stroke: var(--material-progress-bars-background-color, rgba(0, 0, 0, 0.04));
     }
-    :host([animated]) circle.backgroundCircle {
-      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
-    }
-    circle.bar {
+    .bar {
       stroke-linecap: var(--material-progress-bar-linecap, round);
     }
-    :host([animated]) circle.bar {
+    :host([animated]) .barsBackground {
       transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
     }
-    :host([animated]) #container:not(.resizing) circle.bar {
+    :host([animated]) .bar {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    :host([animated]) #container.anim .bar {
       transition: stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1), transform 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
     }
     #contentContainer {
@@ -78,7 +78,7 @@ Custom property | Description | Default
   <template>
     <div id="container">
       <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMinYMin meet">
-        <circle class="backgroundCircle"
+        <circle class="barsBackground"
             r$="[[_radius]]"
             cx$="[[_cx]]"
             cy$="[[_cy]]"
@@ -115,44 +115,12 @@ Custom property | Description | Default
       },
 
       /**
-       * Maximum value for the `sum` of the bars' values.
-       * 
-       * If the `sum` is higher, it will be used as the `max`.
-       */
-      max: {
-        type: Number,
-        value: 100,
-        observer: '_requestUpdate'
-      },
-
-      /**
-       * Sum of all the bars' values.
-       */
-      sum: {
-        type: Number,
-        value: 0,
-        notify: true,
-        readOnly: true,
-        reflectToAttribute: true
-      },
-
-      /**
        * Thickness of every progress bar.
        */
       barThickness: {
         type: Number,
         value: 12,
         observer: '_onResize'
-      },
-
-      /**
-       * Animate when the size of a bar changes.
-       * Has no effect on Internet Explorer or Microsoft Edge as of 2016/09.
-       */
-      animated: {
-        type: Boolean,
-        value: false,
-        reflectToAttribute: true
       }
     },
 
@@ -165,32 +133,31 @@ Custom property | Description | Default
     ],
 
     /**
-     * Update the whole component
+     * Updates the component.
      */
-    update: function() {
+    _doUpdate: function() {
       var _self = this;
       var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
-      var svg = Polymer.dom(this.$.svg);
+      var svg = Polymer.dom(this._getSVG());
       this._setSum(this._computeSum(barsData));
       this._cx = this._clientWidth / 2;
       this._cy = this._clientHeight / 2;
       var halfSize = Math.min(this._cx || this._cy, this._cy || this._cx);
       this._radius = Math.max(0, halfSize - this.barThickness / 2);
-      this._dasharray = 2 * Math.PI * this._radius;
+      this._dasharray = this._round(2 * Math.PI * this._radius);
       
       // Compute each bar's data
       var normalizedMax = Math.max(this.max, this.sum);
       barsData.reduceRight(function(currentSum, bar) {
         bar._angleOffset = (currentSum / normalizedMax) * 360;
-        bar._dashOffset = (1 - bar.value / normalizedMax) * _self._dasharray
-          + (currentSum == 0 ? _self.barThickness / 6.5 : 0); // Fix first bar length
+        bar._dashOffset = _self._round((1 - bar.value / normalizedMax) * _self._dasharray
+          + (currentSum == 0 ? _self.barThickness / 6.5 : 0)); // Fix first bar length
         return bar.value + currentSum;
       }, 0);
-      // previous sum / max = x / 360 => x = (previous sum / max) * 360
 
       // Ensure that there is a svg 'circle' element for each bar, flush the Dom and re-render
       if (barsData.length - (svg.children.length - 1) > 0) {
-        this._createBars(barsData);
+        this._createBars(barsData, 'circle');
         return;
       }
 
@@ -202,48 +169,18 @@ Custom property | Description | Default
 
       // Set up the size of the inner content
       this._updateContentContainer(halfSize * 2);
-
-      // Display the element when ready
-      this.classList.add('ready');
     },
 
     /**
      * Pseudo getter for the inner container of all the SVGs.
      * Needed by `Polymer.MaterialProgressBehavior`
      */
-    _getContainer: function() {
-      return this.$.container;
-    },
+    _getContainer: function() { return this.$.container; },
 
     /**
-     * Create new bars in the DOM, then re-render
+     * Pseudo getter for the SVG node that contains all tha bars.
      */
-    _createBars: function(barsData) {
-      var svg = Polymer.dom(this.$.svg);
-
-      // Add missing svg circle(s)
-      var currentBar;
-      var newCircle;
-      for (var i = 0, barCountToAdd = barsData.length - (svg.children.length - 1); i < barCountToAdd; i++) {
-        currentBar = barsData[i] || {};
-        newCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        this._updateBar(newCircle, this._dasharray, currentBar.color);
-        svg.appendChild(newCircle);
-      }
-
-      // Flush DOM and re-render to allow the css transition
-      Polymer.dom.flush();
-      this._requestUpdate();
-    },
-
-    /**
-     * Compute the real sum off all the 'data.value'
-     */
-    _computeSum: function(barsData) {
-      return barsData.reduce(function(sum, bar) {
-        return sum + (bar.value || 0);
-      }, 0);
-    },
+    _getSVG: function() { return this.$.svg; },
 
     /**
      * Update all necessary attributes of a bar (SVG circle node)
@@ -261,16 +198,12 @@ Custom property | Description | Default
       bar.setAttribute('stroke-dasharray', this._dasharray);
       bar.setAttribute('stroke-dashoffset', dashOffsetExists ? descriptor._dashOffset : this._dasharray);
       // IE and Edge can't handle CSS transform to SVG (and thus no animation)... Thanks MS!
+      var rotation = (descriptor._angleOffset || 0) - 90;
       if (document.documentMode || /Edge\/\d./i.test(navigator.userAgent)) {
-        bar.setAttribute('transform', 'rotate(' + ((descriptor._angleOffset || 0) - 90) + ' ' + this._cx + ' ' + this._cy + ')');
+        bar.setAttribute('transform', 'rotate(' + rotation + ' ' + this._cx + ' ' + this._cy + ')');
       } else {
-        bar.style.transform = 'rotateZ(' + ((descriptor._angleOffset || 0) - 90) + 'deg)';
+        bar.style.transform = 'rotateZ(' + rotation + 'deg)';
         bar.style.transformOrigin = this._cx + 'px ' + this._cy + 'px';
-      }
-      // Working with attribute for the classname. Thanks IE!
-      var classes = bar.getAttribute('class') || '';
-      if (!classes || classes.indexOf(' bar') < 0) {
-        bar.setAttribute('class', classes + ' bar');
       }
     },
 

@@ -8,10 +8,52 @@
    * `Polymer.MaterialProgressBehavior` is the base behavior for all `material-progress` elements.
    * It handles and optimize the measuring logic, and throttle rendering.
    *
+   * Decorated components must implement 4 functions (without any arguments):
+   * 
+   * `_doUpdate` (updates and render the element)
+   * 
+   * `_getContainer` (pseudo getter for the inner container of all the bars)
+   * 
+   * `_getSVG` (pseudo getter for the SVG node that contains the bars)
+   * 
+   * `_updateBar(bar, descriptor)` (updates all necessary attributes of a bar node)
+   *
    * @polymerBehavior Polymer.MaterialProgressBehavior
    */
   Polymer.MaterialProgressBehaviorImpl = {
     properties: {
+      /**
+       * Maximum value for the `sum` of the bars' values.
+       * 
+       * If the `sum` is higher, it will be used as the `max`.
+       */
+      max: {
+        type: Number,
+        value: 100,
+        observer: '_requestUpdate'
+      },
+
+      /**
+       * Sum of all the bars' values.
+       */
+      sum: {
+        type: Number,
+        value: 0,
+        notify: true,
+        readOnly: true,
+        reflectToAttribute: true
+      },
+
+      /**
+       * Animate when the size of a bar changes.
+       * Has no effect on Internet Explorer or Microsoft Edge as of 2016/09.
+       */
+      animated: {
+        type: Boolean,
+        value: false,
+        reflectToAttribute: true
+      },
+
       /**
        * Cached clientWidth of the inner container of the component
        */
@@ -33,20 +75,6 @@
       'iron-resize': '_onResize'
     },
 
-    /**
-     * Update and render the element.
-     */
-    update: function() {
-      // Implemented in each component
-    },
-
-    /**
-     * Pseudo getter for the inner container of all the SVGs
-     */
-    _getContainer: function() {
-      // Implemented in each component
-    },
-
     attached: function() {
       this._requestUpdate();
     },
@@ -57,29 +85,39 @@
     _requestUpdate: function() {
       if (this._isReady || typeof this._getContainer().clientWidth !== 'undefined') {
         this._isReady = true;
-        this.debounce('_doUpdate', this._doUpdate, 100);
-      } else
+        this.debounce('update', this.update, 100);
+      } else {
         this.async(this._requestUpdate, 100);
+      }
     },
 
     /**
-     * Calls the `update` function and cleans after itself!
+     * Updates the whole component
      */
-    _doUpdate: function() {
+    update: function() {
+      var container = this._getContainer();
+
       // Measure if necessary
       if (this._needsMeasuring) {
-        this._clientWidth = this._getContainer().clientWidth;
-        this._clientHeight = this._getContainer().clientHeight;
+        this._clientWidth = container.clientWidth;
+        this._clientHeight = container.clientHeight;
         this._needsMeasuring = false;
       }
 
+      // Set the animation class to the container
+      this.toggleClass('anim', !this._isResizing, container);
+
       // Call the component's `update` function
-      this.update();
+      this._doUpdate();
+
+      // Display the element when ready
+      container.classList.add('ready');
 
       // Remove a pentential `resizing` class
       this.async(function() {
-        this._getContainer().classList.remove('resizing');
-      }, 100);
+        this._isResizing = false;
+        this.toggleClass('anim', false, container);
+      }, 400);
     },
 
     /**
@@ -87,10 +125,47 @@
      */
     _onResize: function() {
       // Set the `resizing` class to override CSS property if necessary
-      this._getContainer().classList.add('resizing');
+      this._isResizing = true;
       // Trigger an update with measuring
       this._needsMeasuring = true;
       this._requestUpdate();
+    },
+
+    /**
+     * Create new bars in the DOM if necessary, then triggers re-rendering
+     */
+    _createBars: function(barsData, nodeName) {
+      var svg = Polymer.dom(this._getSVG());
+
+      // Add missing svg circle(s)
+      var currentBarData;
+      var newBar;
+      for (var i = 0, barCountToAdd = barsData.length - (svg.children.length - 1); i < barCountToAdd; i++) {
+        currentBarData = barsData[i] || {};
+        newBar = document.createElementNS('http://www.w3.org/2000/svg', nodeName);
+        // Working with attribute for the classname. Thanks IE!
+        newBar.setAttribute('class', 'bar');
+        // Important for the initial animation
+        this._updateBar(newBar, {});
+        svg.appendChild(newBar);
+      }
+
+      // Flush DOM and re-render to allow the css transition
+      Polymer.dom.flush();
+      this._requestUpdate();
+    },
+
+    /**
+     * Compute the real sum off all the 'data.value'
+     */
+    _computeSum: function(barsData) {
+      return barsData.reduce(function(sum, bar) {
+        return sum + (bar.value || 0);
+      }, 0);
+    },
+
+    _round: function(n) {
+      return Math.round(n * 100) / 100;
     }
   };
 

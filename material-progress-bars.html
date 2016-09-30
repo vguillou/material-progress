@@ -1,0 +1,239 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="material-progress-behavior.html">
+<
+
+<!--
+A Material design multi-progress bar, inspired by Google Fit.
+
+TODO docs
+
+### Styling
+
+The following custom properties and mixins are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--material-progress-bar-linecap` | Linecap of the bar(s). | `round`
+`--material-progress-bars-background-color` | Background color behind the bar(s). | `rgba(0, 0, 0, 0.04)`
+`--material-progress-background-color` | Background style of the content inside the cirle bar(s). | `transparent`
+`--material-progress-content-style` | Mixin applied to the content inside the cirle bar(s). | `{}`
+
+
+@group material-progress
+@element material-progress-bars
+@demo demo/index.html
+-->
+<dom-module id="material-progress-bars">
+  <style>
+    :host {
+      position: relative;
+      display: block;
+      width: 300px;
+      box-sizing: border-box;
+      padding: 8px;
+    }
+    #container {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 375ms cubic-bezier(0.4, 0.0, 0.2, 1), height 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    #container.ready {
+      opacity: 1;
+    }
+    svg {
+      position: absolute;
+      display: inline-block;
+      left: 0; 
+      right: 0;
+    }
+    .barsBackground {
+      stroke: var(--material-progress-bars-background-color, rgba(0, 0, 0, 0.04));
+      stroke-linecap: var(--material-progress-bar-linecap, round);
+    }
+    .bar {
+      stroke-linecap: var(--material-progress-bar-linecap, round);
+    }
+    .bar.fade-in {
+      opacity: 1;
+    }
+    .bar.fade-out {
+      opacity: 0;
+      transition: opacity 175ms cubic-bezier(0.4, 0.0, 0.2, 1) 200ms;
+    }
+    :host([animated]) .barsBackground {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    :host([animated]) .bar {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    :host([animated]) .bar.fade-out {
+      transition: stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 175ms cubic-bezier(0.4, 0.0, 0.2, 1) 200ms;
+    }
+    :host([animated]) #container.anim .bar {
+      transition: stroke-dasharray 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1), transform 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 175ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    :host([animated]) #container.anim .bar.fade-out {
+      transition: stroke-dasharray 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-dashoffset 375ms cubic-bezier(0.4, 0.0, 0.2, 1), transform 375ms cubic-bezier(0.4, 0.0, 0.2, 1), stroke-width 375ms cubic-bezier(0.4, 0.0, 0.2, 1), opacity 175ms cubic-bezier(0.4, 0.0, 0.2, 1) 200ms;
+    }
+  </style>
+  <template>
+    <div id="container">
+      <svg id="svg" version="1.1" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox$="0 0 [[_clientWidth]] [[barThickness]]" preserveAspectRatio="none">
+        <line id="bg" class="barsBackground" stroke-width$="[[barThickness]]" />
+      </svg>
+    </div>
+  </template>
+</dom-module>
+<script>
+(function() {
+  'use strict';
+  Polymer({
+    is: 'material-progress-bars',
+
+    properties: {
+      /**
+       * Data to display in the progress bar.
+       * Each item describes a new progress bar, and must possess
+       * a `value` and a `color` attribute.
+       * 
+       * Example:
+       *
+       *     {value: 20, color: '#FF5722'}
+       */
+      data: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+
+      /**
+       * Thickness of every progress bar.
+       */
+      barThickness: {
+        type: Number,
+        value: 22,
+        observer: '_onResize'
+      },
+
+      /**
+       * If the progess bar is in stacked mode. Otherwise, it will default to `histogram` mode.
+       */
+      stacked: {
+        type: Boolean,
+        value: true,
+        reflectToAttribute: true
+      }
+    },
+
+    behaviors: [
+      Polymer.MaterialProgressBehavior
+    ],
+
+    observers: [
+      '_requestUpdate(data.*)'
+    ],
+
+    /**
+     * Updates the whole component
+     */
+    _doUpdate: function() {
+      var _self = this;
+      var barsData = JSON.parse(JSON.stringify(this.data || [])).reverse();
+      var svg = Polymer.dom(this._getSVG());
+      this._setSum(this._computeSum(barsData));
+
+      // Resize the container
+      this._getContainer().style.height = this.barThickness + 'px';
+      
+      // Update the background bar
+      this._updateBarPosition(this.$.bg);
+
+      // Compute each bar's data
+      var normalizedMax = Math.max(this.max, this.sum);
+      var barsDataCount = barsData.length;
+      var extraWidth = 0;
+      var isFirstBar = true;
+      barsData.reduceRight(function(currentSum, bar, index) {
+        bar._length = Math.max(bar.value > 0 ? 0.01 : 0,
+          _self._round(bar.value * (_self._clientWidth + extraWidth - _self.barThickness) / normalizedMax));
+        if (bar._length > 0) {
+          // The first bar enjoys an extra linecap: let's compensate and use the extra space for the other bars
+          if (isFirstBar) {
+            extraWidth = bar._length;
+            bar._length = Math.max(0.01, _self._round(bar._length - this.barThickness / 2));
+            extraWidth -= bar._length;
+            isFirstBar = false;
+          }
+        }
+        // Move the bar after the others
+        bar._horizontalOffset = currentSum;
+        return bar._length + currentSum;
+      }, 0);
+
+      // Ensure that there is a svg 'line' element for each bar, flush the Dom and re-render
+      if (barsData.length - (svg.children.length - 1) > 0) {
+        this._createBars(barsData, 'line');
+        return;
+      }
+
+      // Set the correct attributes to each bar
+      var svgChildren = svg.children;
+      for (var i = 0, barCount = svgChildren.length; i < barCount-1; i++) {
+        this._updateBarPosition(svgChildren[i+1]);
+        this._updateBar(svgChildren[i+1], barsData[i] || {});
+      }
+    },
+
+    /**
+     * Pseudo getter for the inner container of all the SVGs.
+     * Needed by `Polymer.MaterialProgressBehavior`
+     */
+    _getContainer: function() { return this.$.container; },
+
+    /**
+     * Pseudo getter for the SVG node that contains all tha bars.
+     */
+    _getSVG: function() { return this.$.svg; },
+
+    /**
+     * Update all necessary attributes of a bar (SVG circle node)
+     */
+    _updateBar: function(bar, descriptor) {
+      var lengthExists = descriptor._length || descriptor._length == 0;
+      if (lengthExists) {
+        bar.setAttribute('stroke', descriptor.color || '#FF5722');
+      }
+      bar.setAttribute('stroke-width', this.barThickness);
+      bar.setAttribute('stroke-dasharray', (lengthExists ? descriptor._length : 0) + ' ' + this._clientWidth);
+      // Offset only in stacked mode
+      bar.setAttribute('stroke-dashoffset', this.stacked ? -descriptor._horizontalOffset : 0);
+
+      // translate the bar to the correct position if not in stacked mode
+      var translation = this.stacked ? 0 : descriptor._index * 2 * this.barThickness;
+      // IE and Edge can't handle CSS transform to SVG (and thus no animation)... Thanks MS!
+      if (document.documentMode || /Edge\/\d./i.test(navigator.userAgent)) {
+        bar.setAttribute('transform', 'translate(0 ' + translation + ')');
+      } else {
+        bar.style.transform = 'translateY(' + translation + 'px)';
+      }
+
+      // fade in/out if appearing/disappearing
+      // Working with attribute for the classname. Thanks IE!
+      var classes = (bar.getAttribute('class') || '').replace(' fade-in', '').replace(' fade-out', '');
+      bar.setAttribute('class', classes + ' fade-' + (lengthExists && descriptor._length > 0 ? 'in' : 'out'));
+    },
+
+    _updateBarPosition: function(bar) {
+      var halfThickness = this.barThickness / 2;
+      bar.setAttribute('x1', halfThickness);
+      bar.setAttribute('y1', halfThickness);
+      bar.setAttribute('x2', this._clientWidth - halfThickness);
+      bar.setAttribute('y2', halfThickness);
+    }
+  });
+})();
+</script>

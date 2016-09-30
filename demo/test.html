@@ -13,9 +13,13 @@
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
   <link rel="import" href="../../paper-styles/color.html">
   <link rel="import" href="../material-progress-circle.html">
+  <link rel="import" href="../material-progress-bars.html">
 
   <style is="custom-style">
     material-progress-circle {
+    }
+    #mpb2 {
+      width: 100%;
     }
     #mpc1 {
     }
@@ -59,56 +63,37 @@
 
 <body unresolved>
 
+  <h3>&lt;material-progress-bars&gt; 1</h3>
+  <material-progress-bars id="mpb1" class="demo" animated></material-progress-bars>
+
+  <material-progress-bars id="mpb2" class="demo" animated></material-progress-bars>
+
   <h3>&lt;material-progress-circle&gt; 1</h3>
-  <material-progress-circle id="mpc1" animated>
+  <material-progress-circle id="mpc1" class="demo" animated>
     <p>line 1</p>
     <p>mpc1</p>
   </material-progress-circle>
 
   <div class="containerHF">
-    <material-progress-circle>
+    <material-progress-circle class="demo">
       <p>line 1</p>
       <p>mpc5</p>
     </material-progress-circle>
-    <material-progress-circle animated>
+    <material-progress-circle class="demo" animated>
       <p>line 1</p>
       <p>mpc6</p>
     </material-progress-circle>
   </div>
 
-  <material-progress-circle id="mpc3" animated>
+  <material-progress-circle id="mpc3" class="demo" animated>
     <p>line 1</p>
     <p>mpc3</p>
   </material-progress-circle>
 
-  <material-progress-circle id="mpc4">
+  <material-progress-circle id="mpc4" class="demo">
     <p>line 1</p>
     <p>mpc4</p>
   </material-progress-circle>
-
-  <!--<h3>&lt;material-progress-circle&gt; 2</h3>
-
-  <div class="testContainer">
-    <div class="test">
-      <svg version="1.1" viewBox="0 0 1000 1000" preserveAspectRatio="xMinYMin meet">
-        <circle cx="500" cy="500" r="500" stroke-width="5" />
-      </svg>
-    </div>
-  </div>
-  
-  <div class="containerHF">
-    <div class="test">
-      <svg version="1.1" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin meet">
-        <circle cx="50" cy="50" r="50" />
-      </svg>
-    </div>
-    <div class="test">
-      <svg version="1.1" viewBox="0 0 100 100" preserveAspectRatio="xMinYMin meet">
-        <circle cx="50" cy="50" r="50" />
-      </svg>
-    </div>
-  </div>
-  -->
 
   
   <script>
@@ -120,7 +105,7 @@
         {value: 30, icon: null, color:'#ff9800'}
       ];*/
       Array.prototype.slice.call(
-        document.querySelectorAll('material-progress-circle')
+        document.querySelectorAll('.demo')
         ,0)
       .forEach(function(mpc) {
         mpc.data = [
