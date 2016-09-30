@@ -164,7 +164,7 @@ Custom property | Description | Default
           // The first bar enjoys an extra linecap: let's compensate and use the extra space for the other bars
           if (isFirstBar) {
             extraWidth = bar._length;
-            bar._length = Math.max(0.01, _self._round(bar._length - this.barThickness / 2));
+            bar._length = Math.max(0.01, _self._round(bar._length - _self.barThickness / 2));
             extraWidth -= bar._length;
             isFirstBar = false;
           }
